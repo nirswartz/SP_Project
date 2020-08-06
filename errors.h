@@ -10,4 +10,7 @@ void checkItemsRead(int read, int shouldRead);
 // checks if the last fwrite was successful - Exit code 30
 void checkItemsWrite(int write, int shouldWrite);
 
+// checks if dividing by zero - Exit code 40
+void checkDivideByZero(int num);
+
 #endif //SP_PROJECT_ERRORS_H

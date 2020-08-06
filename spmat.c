@@ -1,35 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "spmat.h"
-
-
+#include "errors.h"
 
 void printSparse(struct _spmat *A){
-    int nnz = *((A->row)+(A->n));
+    int nnz = *((A->row)+((A->n)));
     int i;
-
     printf("{");
-    for (i = 0; i < nnz; ++i) {
-        printf("%f,",*(A->values+i));
+    for (i = 0; i < nnz-1; ++i) {
+        printf("%f,",*((A->values)+i));
     }
-    printf("}\n");
-
+    printf("%f}\n",*((A->values)+i));
     printf("{");
-    for (i = 0; i < nnz; ++i) {
-        printf("%d,",*(A->col+i));
+    for (i = 0; i < nnz-1; ++i) {
+        printf("%d,",*((A->col)+i));
     }
-    printf("}\n");
-
+    printf("%d}\n",*((A->col)+i));
     printf("{");
-    for (i = 0; i < A->n+1; ++i) {
-        printf("%d,",*(A->row+i));
+    for (i = 0; i < A->n; ++i) {
+        printf("%d,",*((A->row)+i));
     }
-    printf("}\n");
+    printf("%d}\n",*((A->row)+i));
 }
 
 void add_row(struct _spmat *A, const double *row, int i){
-    double *valPtr = ((A->values)+(A->row[i]));
-    int *colPtr = ((A->col)+(A->row[i]));
+    double *valPtr = (A->values)+(A->row[i]);
+    int *colPtr = (A->col)+(A->row[i]);
     int cntNz = 0, col;
     for (col = 0; col < (A->n); ++col) {
         if (*row != 0){
@@ -52,19 +48,15 @@ void freeMat(struct _spmat *A){
 
 
 void mult(const struct _spmat *A, const double *v, double *result){
-    int *p1 = A->row, i,j, *colPtr = A->col;
-    int *p2 = (A->row)+1;
+    int *p1 = A->row, *p2 = (A->row)+1,i,j, *colPtr = A->col;
     double *valPtr = A->values, sum;
-    A->printSparse(A);
     for (i = 0; i < (A->n); ++i) {
         sum=0;
         for (j = 0; j < ((*p2) - (*p1)); ++j) {
             sum += (*valPtr * v[*colPtr]);
             valPtr++;
             colPtr++;
-
         }
-
         *result = sum;
         result++;
         p1++;
@@ -86,13 +78,18 @@ double doProductByRow(const struct _spmat *A, int rowNum, const double *v, doubl
 
 spmat* spmat_allocate_array(int n, int nnz){
     spmat *sparse = malloc(sizeof(spmat));
+    checkAllocation(sparse);
     sparse->n = n;
-    sparse->values = (double*) malloc(nnz*sizeof(double));
-    sparse->col = (int*) malloc(nnz*sizeof(int));
+    sparse->values = (double*) calloc(nnz,sizeof(double));
+    checkAllocation(sparse->values);
+    sparse->col = (int*) calloc(nnz,sizeof(int));
+    checkAllocation(sparse->col);
     sparse->row = (int*) calloc(n+1,sizeof(int));
-    sparse->add_row= &add_row;
-    sparse->printSparse = &printSparse;
-    sparse->mult = &mult;
+    checkAllocation(sparse->row);
+    sparse->add_row=&add_row;
+    sparse->mult=&mult;
+    sparse->free=&freeMat;
+    sparse->printSparse=&printSparse;
+    sparse->doProductByRow=&doProductByRow;
     return sparse;
-
 }

@@ -3,8 +3,8 @@
 
 void checkAllocation(void* pointer){
     if(pointer==NULL){
-    printf("Allocation Failed!\n");
-    exit(10);
+        printf("Allocation Failed!\n");
+        exit(10);
     }
 }
 
@@ -19,6 +19,13 @@ void checkItemsWrite(int write, int shouldWrite){
     if(write!=shouldWrite){
         printf("Write Failed! Should write %d items, but write %d items\n",write,shouldWrite);
         exit(30);
+    }
+}
+
+void checkDivideByZero(int num){
+    if(num==0){
+        printf("Divide by zero!");
+        exit(40);
     }
 }
 
