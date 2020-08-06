@@ -17,11 +17,9 @@ typedef struct _spmat {
 
 	/* Private field for inner implementation.
 	 * Should not be read or modified externally */
-	void	*private;
+	double	*values;
+	int *col, *row;
 } spmat;
-
-/* Allocates a new linked-lists sparse matrix of size n */
-spmat* spmat_allocate_list(int n);
 
 /* Allocates a new arrays sparse matrix of size n with nnz non-zero elements */
 spmat* spmat_allocate_array(int n, int nnz);

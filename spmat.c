@@ -67,6 +67,6 @@ void mult(const struct _spmat *A, const double *v, double *result){
 }
 
 void multRow(const struct _spmat *A, int i, const double *v, double *result){
-	A->row[i+1] - A->row[i]
+	int numberOfElements = A->row[i+1] - A->row[i];
 }
 
