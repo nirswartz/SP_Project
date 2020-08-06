@@ -2,38 +2,34 @@
 #include <stdlib.h>
 #include "spmat.h"
 
-spmat* spmat_allocate_array(int n, int nnz){
-    spmat *sparse = malloc(sizeof(spmat));
-    sparse->n = n;
-    sparse->values = (double*) malloc(nnz*sizeof(double));
-    sparse->col = (int*) malloc(nnz*sizeof(int));
-    sparse->row = (int*) calloc(n+1,sizeof(int));
-    return sparse;
-}
+
 
 void printSparse(struct _spmat *A){
-    int nnz = A->row[(A->n)+1];
+    int nnz = *((A->row)+(A->n));
     int i;
+
     printf("{");
     for (i = 0; i < nnz; ++i) {
-        printf("%f,",A->values[i]);
+        printf("%f,",*(A->values+i));
     }
     printf("}\n");
+
     printf("{");
     for (i = 0; i < nnz; ++i) {
-        printf("%d,",A->col[i]);
+        printf("%d,",*(A->col+i));
     }
     printf("}\n");
+
     printf("{");
-    for (i = 0; i < A->n; ++i) {
-        printf("%d,",A->row[i]);
+    for (i = 0; i < A->n+1; ++i) {
+        printf("%d,",*(A->row+i));
     }
     printf("}\n");
 }
 
 void add_row(struct _spmat *A, const double *row, int i){
-    double *valPtr = (A->values)+(A->row[i]);
-    int *colPtr = (A->col)+(A->row[i]);
+    double *valPtr = ((A->values)+(A->row[i]));
+    int *colPtr = ((A->col)+(A->row[i]));
     int cntNz = 0, col;
     for (col = 0; col < (A->n); ++col) {
         if (*row != 0){
@@ -56,15 +52,19 @@ void freeMat(struct _spmat *A){
 
 
 void mult(const struct _spmat *A, const double *v, double *result){
-    int *p1 = A->row, *p2 = p1++,i,j, *colPtr = A->col;
+    int *p1 = A->row, i,j, *colPtr = A->col;
+    int *p2 = (A->row)+1;
     double *valPtr = A->values, sum;
+    A->printSparse(A);
     for (i = 0; i < (A->n); ++i) {
         sum=0;
-        for (j = 0; j < (*p2 - *p1); ++j) {
+        for (j = 0; j < ((*p2) - (*p1)); ++j) {
             sum += (*valPtr * v[*colPtr]);
             valPtr++;
             colPtr++;
+
         }
+
         *result = sum;
         result++;
         p1++;
@@ -82,4 +82,17 @@ double doProductByRow(const struct _spmat *A, int rowNum, const double *v, doubl
         colPtr++;
     }
     return sum;
+}
+
+spmat* spmat_allocate_array(int n, int nnz){
+    spmat *sparse = malloc(sizeof(spmat));
+    sparse->n = n;
+    sparse->values = (double*) malloc(nnz*sizeof(double));
+    sparse->col = (int*) malloc(nnz*sizeof(int));
+    sparse->row = (int*) calloc(n+1,sizeof(int));
+    sparse->add_row= &add_row;
+    sparse->printSparse = &printSparse;
+    sparse->mult = &mult;
+    return sparse;
+
 }
