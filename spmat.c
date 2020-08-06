@@ -1,12 +1,32 @@
 #include "spmat.h";
+#include <stdlib.h>;
 
 spmat* spmat_allocate_array(int n, int nnz){
-	spmat sparse;
-	sparse.n = n;
-	sparse.values = (double*) malloc(nnz*sizeof(double));
-	sparse.col = (int*) malloc(nnz*sizeof(int));
-	sparse.row = (int*) calloc((n+1)*sizeof(int));
+	spmat *sparse = malloc(sizeof(spmat));
+	sparse->n = n;
+	sparse->values = (double*) malloc(nnz*sizeof(double));
+	sparse->col = (int*) malloc(nnz*sizeof(int));
+	sparse->row = (int*) calloc((n+1)*sizeof(int));
 	return sparse;
+}
+
+void printSparse(struct _spmat *A){
+	int nnz = A->row[(A->n)+1];
+	printf("{");
+	for (int i = 0; i < nnz; ++i) {
+		printf("%d,",A->values[i]);
+	}
+	printf("}\n");
+	printf("{");
+	for (int i = 0; i < nnz; ++i) {
+			printf("%d,",A->col[i]);
+	}
+	printf("}\n");
+	printf("{");
+	for (int i = 0; i < A->n; ++i) {
+			printf("%d,",A->row[i]);
+	}
+	printf("}\n");
 }
 
 void add_row(struct _spmat *A, const double *row, int i){
@@ -68,5 +88,12 @@ void mult(const struct _spmat *A, const double *v, double *result){
 
 void multRow(const struct _spmat *A, int i, const double *v, double *result){
 	int numberOfElements = A->row[i+1] - A->row[i];
+	int sum = 0;
+	double *valPtr = A->values[(A->row[i])], *colPtr = A->col[(A->row[i])];
+	for (int j = 0; j < numberOfElements; ++j) {
+		sum += *valPtr * v[*colPtr];
+		valPtr++;
+		colPtr++;
+	}
 }
 
