@@ -29,9 +29,9 @@ void checkDivideByZero(int num, int rowNum){
     }
 }
 
-void checkOpenFile(void* open, char *fileName, int rowNum){
+void checkOpenFile(void* open, char *fileName, int rowNum, char* programFile){
     if(open==NULL){
-        printf("Couldn't open the file: %s! (Row %d)",fileName,rowNum);
+        printf("Couldn't open: %s in line: %d in program: %s! \n",fileName,rowNum, programFile);
         exit(50);
     }
 }
