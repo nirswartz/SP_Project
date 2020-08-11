@@ -64,7 +64,7 @@ void mult(const struct _spmat *A, const double *v, double *result){
     }
 }
 
-double doProductByRow(const struct _spmat *A, int rowNum, const double *v, double *result){
+double doProductByRow(const struct _spmat *A, int rowNum, const double *v){
     int numberOfElements = A->row[rowNum+1] - A->row[rowNum], i;
     double *valPtr = (A->values)+(A->row[rowNum]), sum = 0;
     int *colPtr = (A->col)+(A->row[rowNum]);
@@ -78,14 +78,14 @@ double doProductByRow(const struct _spmat *A, int rowNum, const double *v, doubl
 
 spmat* spmat_allocate_array(int n, int nnz){
     spmat *sparse = malloc(sizeof(spmat));
-    checkAllocation(sparse);
+    checkAllocation(sparse, __LINE__);
     sparse->n = n;
     sparse->values = (double*) calloc(nnz,sizeof(double));
-    checkAllocation(sparse->values);
+    checkAllocation(sparse->values, __LINE__);
     sparse->col = (int*) calloc(nnz,sizeof(int));
-    checkAllocation(sparse->col);
+    checkAllocation(sparse->col, __LINE__);
     sparse->row = (int*) calloc(n+1,sizeof(int));
-    checkAllocation(sparse->row);
+    checkAllocation(sparse->row, __LINE__);
     sparse->add_row=&add_row;
     sparse->mult=&mult;
     sparse->free=&freeMat;

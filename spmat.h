@@ -20,8 +20,10 @@ typedef struct _spmat {
     /* Multiplies matrix A by vector v, into result (result is pre-allocated) */
     void	(*mult)(const struct _spmat *A, const double *v, double *result);
 
-    double (*doProductByRow)(const struct _spmat *A, int rowNum, const double *v, double *result);
+    /* delete?*/
+    double (*doProductByRow)(const struct _spmat *A, int rowNum, const double *v);
 
+    /* delete?*/
     void (*printSparse)(struct _spmat *A);
 
 } spmat;

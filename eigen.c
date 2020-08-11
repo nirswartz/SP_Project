@@ -18,7 +18,7 @@ void initialization(double *arr, int rowLength){
     }
 }
 
-/*calculating dot product of two rows
+/*calculating dot product of two rows*/
 double dotProduct(double* row1,double* row2,int rowLength){
     int i;
     double sum=0;
@@ -28,32 +28,24 @@ double dotProduct(double* row1,double* row2,int rowLength){
         row2++;
     }
     return sum;
-}*/
+}
 
 /* (Ab) / (||Ab||) */
-void normalized(double *arr, double norm, int rowLength){
-    int i;
-    for(i=0; i<rowLength; i++){
-        *arr = (double)*arr / norm;
-    	arr++;
+void normalized(double *arr, int rowLength) {
+    int i,norm;
+    norm=dotProduct(arr,arr,rowLength);
+    checkDivideByZero(norm, __LINE__)
+    for (i = 0; i < rowLength; i++) {
+        *arr = (double) *arr / norm;
+        arr++;
     }
 }
 
 /*calculating next eigenvector*/
 /* return the norm of bNew*/
-double nextVector(FILE* fInput, double* b, double* bNew,double *matrixRow, int rowLength){
-    int i,n;
-	double sum=0, tmp;
-	for(i = 0; i < rowLength; ++i){
-		/*read line in cov matrix*/
-		n=fread(matrixRow, sizeof(double), rowLength, fInput);
-		checkItemsRead(n,rowLength);
-		tmp = dotProduct(matrixRow, b, rowLength);
-		*(bNew) = tmp;
-		sum=sum+(tmp*tmp);
-		bNew++;
-    }
-    return sqrt(sum);
+void nextVector(spmat *matrix, double* b, double* bNew, int rowLength){
+    matrix->mult(matrix,b,bNew)
+    normalized(bNew,rowLength)
 }
 
 /* check if the change in the new vector is small enough*/
@@ -68,26 +60,25 @@ int bigDifference(double *b, double* bNew, int rowLength){
 	return 0;
 }
 
-void powerIteration(spmat *matrix, double *vector, int vectorSize)
+void powerIteration(spmat *matrix, double *vector)
 {
-	int		n, flag=1;
-	double  *b, *bNew,*matrixRow, *tmp ,norm;
+	int		flag=1, vectorSize=matrix->n;
+	double  *b, *bNew, *tmp ,norm;
 
 	/*initialize arr for eigenvector*/
 	b = calloc(vectorSize,sizeof(double));
-	checkAllocation(b);
+	checkAllocation(b, __LINE__);
 	initialization(b, vectorSize);
 
 	/*initialize new eigenvector*/
 	bNew = calloc(vectorSize,sizeof(double));
-    checkAllocation(bNew);
+    checkAllocation(bNew, __LINE__);
 
 	/*start iterations - if difference bigger than epsilon continue, else stop iterating*/
 	while(flag==1)
 	{
 		/*calculation of b_(k+1)*/
-		norm=nextVector(fInput, b, bNew, matrixRow, vectorSize);
-        normalized(bNew, norm, vectorSize);
+		nextVector(matrix, b, bNew, vectorSize);
         /*calculate difference*/
         flag=bigDifference(b, bNew, vectorSize);
         /*switch pointers of b and bNew in order to avoid new calloc*/
