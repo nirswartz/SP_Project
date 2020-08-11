@@ -1,4 +1,5 @@
-
+#include "spmat.h"
+#include <stdio.h>
 #ifndef MODMAT_H_
 #define MODMAT_H_
 
@@ -19,7 +20,7 @@ typedef struct _modMat {
 } modMat;
 
 /* Allocates new modularity matrix from input file */
-modMat* modMat_allocate_array(FILE *fInput);
+modMat* modMat_allocate(FILE *fInput);
 
 
 #endif

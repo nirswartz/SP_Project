@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "spmat.h"
-
+#include "modMat.h"
 
 int main() {
+	/* main for spmat!!
+
     int i;
     double arr[3][3] = {{61,0,0},{0,50,0},{0,84,22}};
     double brr[3] = {1,-1,1};
@@ -21,6 +23,12 @@ int main() {
            printf("%f,",*(res+i));
        }
        printf("}\n");
-  /*  mys->printSparse(mys);*/
+    mys->printSparse(mys);*/
+
+	 FILE *f1;
+	 f1 = fopen("graph.in","r");
+	 modMat *myMat = modMat_allocate(f1);
+	 printf("%d",myMat->n);
+
     return 0;
 }

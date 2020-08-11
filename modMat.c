@@ -1,5 +1,9 @@
 #include "modMat.h"
+#include "spmat.h"
+#include "errors.h"
+
 #include <stdio.h>
+#include <stdlib.h>
 
 /* calculate k vector and M (nnz) */
 void countNnz(modMat *B, FILE *fInput){
@@ -7,11 +11,11 @@ void countNnz(modMat *B, FILE *fInput){
 
     for(i = 0; i < B->n ; ++i){
         /*read k_i from file*/
-        check = fread(k_i, sizeof(int), 1, fInput);
+        check = fread(&k_i, sizeof(int), 1, fInput);
         checkItemsRead(check, 1, __LINE__);
         *kVector = k_i;
         M += k_i;
-        fseak(fInput, k_i , SEEK_CUR); /*לבדוק שהאינדקסים תקינים???*/
+        fseek(fInput, k_i , SEEK_CUR); /*לבדוק שהאינדקסים תקינים???*/
     }
     /* return to the beginning of the file */
     fseek(fInput, 1 , SEEK_SET);
@@ -27,7 +31,7 @@ void createSparseA(modMat *B, FILE *fInput){
     spmat *A = spmat_allocate_array(B->n, B->M);
 
     for(i = 0; i < B->n ; ++i){
-        fseak(fInput, 1 , SEEK_CUR);
+        fseek(fInput,1,SEEK_CUR);
         check = fread(indices, sizeof(int), k, fInput);
         checkItemsRead(check,k,__LINE__);
         p = indices;
@@ -35,7 +39,8 @@ void createSparseA(modMat *B, FILE *fInput){
         	row[*p] = 1;
         	p++;
         }
-        A->add_row(A, row, i);
+
+
         p = indices;
         for(j = 0; j < *k ; ++j){
         	row[*p] = 0;
@@ -46,7 +51,7 @@ void createSparseA(modMat *B, FILE *fInput){
     B->A = A;
 }
 
-modMat* modMat_allocate_array(FILE *fInput){
+modMat* modMat_allocate(FILE *fInput){
 	int n, *numOfNodes;
 
 	/* assign memory */
