@@ -12,10 +12,10 @@ void countNnz(modMat *B, FILE *fInput){
     for(i = 0; i < B->n ; ++i){
         /*read k_i from file*/
         check = fread(&k_i, sizeof(int), 1, fInput);
-        checkItemsRead(check, 1, __LINE__);
+        checkItemsRead(check, 1, __LINE__, __FILE__);
         *kVector = k_i;
         M += k_i;
-        fseek(fInput, k_i , SEEK_CUR); /*ìáãå÷ ùäàéðã÷ñéí ú÷éðéí???*/
+        fseek(fInput, k_i , SEEK_CUR); /*Ã¬Ã¡Ã£Ã¥Ã· Ã¹Ã¤Ã Ã©Ã°Ã£Ã·Ã±Ã©Ã­ ÃºÃ·Ã©Ã°Ã©Ã­???*/
     }
     /* return to the beginning of the file */
     fseek(fInput, 1 , SEEK_SET);
@@ -24,27 +24,27 @@ void countNnz(modMat *B, FILE *fInput){
 
 /* create sparse matrix of A form input file */
 void createSparseA(modMat *B, FILE *fInput){
-	int *row, *indices, *p, i, j, check, *k = B->k;
-	row = malloc(B->n * sizeof(int));
-	indices = malloc(B->n * sizeof(int));
+    int *row, *indices, *p, i, j, check, *k = B->k;
+    row = malloc(B->n * sizeof(int));
+    indices = malloc(B->n * sizeof(int));
 
     spmat *A = spmat_allocate_array(B->n, B->M);
 
     for(i = 0; i < B->n ; ++i){
         fseek(fInput,1,SEEK_CUR);
-        check = fread(indices, sizeof(int), k, fInput);
-        checkItemsRead(check,k,__LINE__);
+        check = fread(indices, sizeof(int), *k, fInput);
+        checkItemsRead(check,*k,__LINE__, __FILE__);
         p = indices;
         for(j = 0; j < *k ; ++j){
-        	row[*p] = 1;
-        	p++;
+            row[*p] = 1;
+            p++;
         }
 
 
         p = indices;
         for(j = 0; j < *k ; ++j){
-        	row[*p] = 0;
-        	p++;
+            row[*p] = 0;
+            p++;
         }
         k++;
     }
@@ -52,15 +52,15 @@ void createSparseA(modMat *B, FILE *fInput){
 }
 
 modMat* modMat_allocate(FILE *fInput){
-	int n, *numOfNodes;
+    int n, *numOfNodes;
 
-	/* assign memory */
-	modMat *mat = malloc(sizeof(modMat));
-	checkAllocation(mat, __LINE__);
+    /* assign memory */
+    modMat *mat = malloc(sizeof(modMat));
+    checkAllocation(mat, __LINE__, __FILE__);
 
     /*initialize matrix with size from the file*/
     n = fread(&numOfNodes, sizeof(int), 1, fInput);
-    checkItemsRead(n,1,__LINE__);
+    checkItemsRead(n,1,__LINE__, __FILE__);
     mat->n = n;
     /* create vector k and calculate M*/
     mat->k = (int*) calloc(n,sizeof(int));
@@ -68,6 +68,5 @@ modMat* modMat_allocate(FILE *fInput){
     /* create sparse matrix of A form input file */
     createSparseA(mat, fInput);
 
-	return mat;
+    return mat;
 }
-

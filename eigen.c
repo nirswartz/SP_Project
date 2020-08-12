@@ -3,17 +3,17 @@
 #include <time.h>
 #include <math.h>
 #include "errors.h"
+#include "spmat.h"
+#include "help.h"
 
-
-double epsilon = 0.0001;
+double epsilon = 0.00001;
 
 /*create b0, fill it with random values*/
 void initialization(double *arr, int rowLength){
-	int i;
-	/* initialize (seed) the random number generator */
-	srand(time(NULL));
-	for(i = 0; i < rowLength; ++i){
-        *(arr)= rand();
+    int i;
+    srand(time(0));
+    for(i = 0; i < rowLength; ++i){
+        *(arr)=rand();
         arr++;
     }
 }
@@ -32,9 +32,9 @@ double dotProduct(double* row1,double* row2,int rowLength){
 
 /* (Ab) / (||Ab||) */
 void normalized(double *arr, int rowLength) {
-    int i,norm;
-    norm=dotProduct(arr,arr,rowLength);
-    checkDivideByZero(norm, __LINE__)
+    int i;
+    double norm=sqrt(dotProduct(arr,arr,rowLength));
+    checkDivideByZero(norm, __LINE__,__FILE__);
     for (i = 0; i < rowLength; i++) {
         *arr = (double) *arr / norm;
         arr++;
@@ -44,59 +44,59 @@ void normalized(double *arr, int rowLength) {
 /*calculating next eigenvector*/
 /* return the norm of bNew*/
 void nextVector(spmat *matrix, double* b, double* bNew, int rowLength){
-    matrix->mult(matrix,b,bNew)
-    normalized(bNew,rowLength)
+    matrix->mult(matrix,b,bNew);
+    normalized(bNew,rowLength);
 }
 
 /* check if the change in the new vector is small enough*/
 int bigDifference(double *b, double* bNew, int rowLength){
-	int i;
-	for(i = 0; i < rowLength; ++i){
-		if(fabs(*b - *bNew) > epsilon)
-			return 1;
-		b++;
-		bNew++;
-	}
-	return 0;
+    int i;
+    for(i = 0; i < rowLength; ++i){
+        if(fabs(*b - *bNew) > epsilon)
+            return 1;
+        b++;
+        bNew++;
+    }
+    return 0;
 }
 
 void powerIteration(spmat *matrix, double *vector)
 {
-	int		flag=1, vectorSize=matrix->n;
-	double  *b, *bNew, *tmp ,norm;
+    int		flag=1, vectorSize=matrix->n,i;
+    double  *b, *bNew, *tmp ,norm;
 
-	/*initialize arr for eigenvector*/
-	b = calloc(vectorSize,sizeof(double));
-	checkAllocation(b, __LINE__);
-	initialization(b, vectorSize);
+    /*initialize arr for eigenvector*/
+    b = calloc(vectorSize,sizeof(double));
+    checkAllocation(b, __LINE__,__FILE__);
+    initialization(b, vectorSize);
 
-	/*initialize new eigenvector*/
-	bNew = calloc(vectorSize,sizeof(double));
-    checkAllocation(bNew, __LINE__);
+    /*initialize new eigenvector*/
+    bNew = calloc(vectorSize,sizeof(double));
+    checkAllocation(bNew, __LINE__,__FILE__);
 
-	/*start iterations - if difference bigger than epsilon continue, else stop iterating*/
-	while(flag==1)
-	{
-		/*calculation of b_(k+1)*/
-		nextVector(matrix, b, bNew, vectorSize);
+    /*start iterations - if difference bigger than epsilon continue, else stop iterating*/
+    while(flag==1)
+    {
+        /*calculation of b_(k+1)*/
+        nextVector(matrix, b, bNew, vectorSize);
         /*calculate difference*/
         flag=bigDifference(b, bNew, vectorSize);
         /*switch pointers of b and bNew in order to avoid new calloc*/
         tmp=b;
         b=bNew;
         bNew=tmp;
-	}
+    }
 
-	/* copy eigenvector with greatest eigenvalue into output vector */
-	tmp=bNew;
-    for(i=0; i<rowLength; i++){
+    /* copy eigenvector with greatest eigenvalue into output vector */
+    tmp=bNew;
+    for(i=0; i<vectorSize; i++){
         *vector=*bNew;
         vector++;
         bNew++;
     }
     bNew=tmp;
 
-	/*free heap*/
-	free(b);
-	free(bNew);
+    /*free heap*/
+    free(b);
+    free(bNew);
 }

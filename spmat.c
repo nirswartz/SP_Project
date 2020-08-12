@@ -78,14 +78,14 @@ double doProductByRow(const struct _spmat *A, int rowNum, const double *v){
 
 spmat* spmat_allocate_array(int n, int nnz){
     spmat *sparse = malloc(sizeof(spmat));
-    checkAllocation(sparse, __LINE__);
+    checkAllocation(sparse, __LINE__, __FILE__);
     sparse->n = n;
     sparse->values = (double*) calloc(nnz,sizeof(double));
-    checkAllocation(sparse->values, __LINE__);
+    checkAllocation(sparse->values, __LINE__, __FILE__);
     sparse->col = (int*) calloc(nnz,sizeof(int));
-    checkAllocation(sparse->col, __LINE__);
+    checkAllocation(sparse->col, __LINE__, __FILE__);
     sparse->row = (int*) calloc(n+1,sizeof(int));
-    checkAllocation(sparse->row, __LINE__);
+    checkAllocation(sparse->row, __LINE__, __FILE__);
     sparse->add_row=&add_row;
     sparse->mult=&mult;
     sparse->free=&freeMat;
