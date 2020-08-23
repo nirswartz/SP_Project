@@ -105,7 +105,6 @@ spmat* spmat_allocate_array(int n, int nnz){
     checkAllocation(sparse, __LINE__,__FILE__);
     sparse->n = n;
     sparse->values = (double*) calloc(nnz,sizeof(double));
-    printf("%d",nnz);
     checkAllocation(sparse->values, __LINE__,__FILE__);
     sparse->col = (int*) calloc(nnz,sizeof(int));
     checkAllocation(sparse->col, __LINE__,__FILE__);

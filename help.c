@@ -8,6 +8,13 @@
 #include "help.h"
 #include "modMat.h"
 
+/*
+#define NIR_INPUT\ C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\
+#define NIR_OUTPUT\ C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\outputs\\
+#define SONIA_INPUT\ C://project//inputs//
+#define SONIA_OUTPUT\ C://project//outputs//
+*/
+
 /* calc NNZ elements of regular adjacency matrix in file location*/
 int checkNNZ(FILE *fInput, int vectorSize){
     int count=0,i,j,n;
@@ -135,19 +142,19 @@ void printFileMatrix(char *location){
 
 /* create new file of regular matrix in location
  * matrix template: (num of rows - int)(num of columns - int)(values - double)*/
-void createMatrixFile(double *values,int n, int m, char *location){
+void createMatrixFile(int *values,int n, int m, char *location){
     FILE *fOutput;
     int check,i;
 
     fOutput = fopen(location, "w");
     checkOpenFile(fOutput, location ,__LINE__,__FILE__ );
 
-    check =fwrite(&m, sizeof(int), 1, fOutput);
+   /* check =fwrite(&m, sizeof(int), 1, fOutput);
     assert(check==1);
     check =fwrite(&n, sizeof(int), 1, fOutput);
-    assert(check==1);
+    assert(check==1);*/
     for(i=0;i<m;i++){
-        check = fwrite(values, sizeof(double), n, fOutput);
+        check = fwrite(values, sizeof(int), n, fOutput);
         assert(check==n);
         values+=n;
     }
@@ -155,7 +162,16 @@ void createMatrixFile(double *values,int n, int m, char *location){
 }
 
 /* print received vector*/
-void printVector(double *vector, int vectorSize){
+void printVectorInt(int *vector, int vectorSize){
+    int i;
+    for(i=0;i<vectorSize;i++){
+        printf("%d, ",vector[i]);
+    }
+    printf("\n");
+}
+
+/* print received vector*/
+void printVectorDouble(double *vector, int vectorSize){
     int i;
     for(i=0;i<vectorSize;i++){
         printf("%f, ",vector[i]);
@@ -163,9 +179,11 @@ void printVector(double *vector, int vectorSize){
     printf("\n");
 }
 
-void printAllIntValuesFromFIle(FILE *fInput){
+void printAllIntValuesFromFIle(char *location){
     int value,i=0;
-    rewind(fInput);
+    FILE *fInput;
+    fInput = fopen(location, "r");
+    checkOpenFile(fInput, location ,__LINE__,__FILE__ );
     while(!feof(fInput)){
         fread(&value, sizeof(int), 1, fInput);
         printf("%d (i=%d), ",value,i);
@@ -197,15 +215,15 @@ void test2(){
     createMatrixFile(values,3,3,location);
     printFileMatrix(location);*/
 
-    double values[3]={13707.000000, 31369.000000, 10098.000000};
-    char *location="C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\b0.arr";
-    createMatrixFile(values,3,1,location);
-    printFileMatrix(location);
+    int values[18]={5,2,1,2,3,0,2,3,3,0,1,4,2,1,4,2,2,3};
+    char *location="C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\graph5.in";
+    createMatrixFile(values,18,1,location);
+    printAllIntValuesFromFIle(location);
+    /*printFileMatrix(location);*/
 }
 
-void test3(){
-    char *f1 = "C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\graph.in";
+void test3() {
+    char *f1 = "C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\graph5.in";
     modMat *myMat;
     myMat = modMat_allocate(f1);
-    printf("%d",myMat->n);
 }

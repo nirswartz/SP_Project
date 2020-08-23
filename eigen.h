@@ -21,4 +21,4 @@ int bigDifference(double *b, double* bNew, int rowLength);
 /*calculating dominant eigen vector */
 void powerIteration(spmat *matrix, double *vector);
 
-#endif //SP_PROJECT_EIGEN_H
+#endif

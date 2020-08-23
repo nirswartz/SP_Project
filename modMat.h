@@ -16,14 +16,18 @@ typedef struct _modMat {
     double *f;
     /* 1-norm of B^[g] */
     double norm;
-    /* getter */
+    /* getter for B(i,j)  */
     double (*getB)(const struct _modMat *B, int i, int j);
-
+    /* getter for B^(i,j) */
+    double (*getHatB)(const struct _modMat *B, int i, int j);
 
 } modMat;
 
 /* Allocates new modularity matrix from input file */
 modMat* modMat_allocate(char *location);
 
+void printB(modMat *B);
+
+void printHatB(modMat *HatB);
 
 #endif
