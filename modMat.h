@@ -23,7 +23,7 @@ typedef struct _modMat {
 } modMat;
 
 /* Allocates new modularity matrix from input file */
-modMat* modMat_allocate(FILE *fInput);
+modMat* modMat_allocate(char *location);
 
 
 #endif

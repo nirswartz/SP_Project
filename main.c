@@ -6,7 +6,7 @@
 #include "errors.h"
 
 int main() {
-
+/*
     int i, j;
     double arr[3][3] = {{61,50,0},{0,0,0},{0,84,22}};
     double brr[3] = {1,-1,1};
@@ -31,22 +31,16 @@ int main() {
        printf("}\n");
     mys->printSparse(mys);
 
-
-	/*FILE *f1;
+*/
+	char *f1;
 	 modMat *myMat;
-	 int n, *numOfNodes;
-
-	 printf("check!!1");
+	 printf("check!!1\n");
 
 
-	 f1 = fopen("src\\graph.in","r");
-	 n = fread(&numOfNodes, sizeof(int), 1, f1);
-	 printf("check!!1");
-	 checkItemsRead(n,1,__LINE__);
-	 printf("check!!1~");
+	 f1 = "C:\\project\\graph.in";
 	 myMat = modMat_allocate(f1);
 	 printf("%d",myMat->n);
 	 printf("check");
-*/
+
     return 0;
 }

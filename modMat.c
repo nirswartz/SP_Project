@@ -13,18 +13,20 @@ void countNnz(struct _modMat *B, FILE *fInput){
         check = fread(&k_i, sizeof(int), 1, fInput);
         checkItemsRead(check, 1, __LINE__,__FILE__);
         *kVector = k_i;
+        kVector++;
         M += k_i;
         fseek(fInput, k_i , SEEK_CUR); /*לבדוק שהאינדקסים תקינים???*/
     }
-    /* return to the beginning of the file */
+    /* return to k_1 in the file  */
     fseek(fInput, 1 , SEEK_SET);
     B->M = M;
 }
 
 /* create sparse matrix of A form input file */
 void createSparseA(struct _modMat *B, FILE *fInput){
-	int *row, *indices, *p, i, j, check, *k = B->k;
-	row = malloc(B->n * sizeof(int));
+	int *indices, *p, i, j, check, *k = B->k;
+	double *row;
+	row = malloc(B->n * sizeof(double));
 	indices = malloc(B->n * sizeof(int));
 
     spmat *A = spmat_allocate_array(B->n, B->M);
@@ -35,14 +37,17 @@ void createSparseA(struct _modMat *B, FILE *fInput){
         checkItemsRead(check,*k,__LINE__,__FILE__);
         p = indices;
         for(j = 0; j < *k ; ++j){
-        	row[*p] = 1;
+        	row[*p] = 1.0;
         	p++;
         }
+        A->add_row(B->A, row, i);
+        /*initialization of row*/
         p = indices;
         for(j = 0; j < *k ; ++j){
-        	row[*p] = 0;
+        	row[*p] = 0.0;
         	p++;
         }
+
         k++;
     }
     B->A = A;
@@ -64,10 +69,11 @@ void createF(struct _modMat *B){
 }
 
 /* calculating 1-norm of B_hat using getter of B */
-double calculateNorm(const struct _modMat *B){
+void calculateNorm(struct _modMat *B){
 	int i, j;
 	double *arr, *p, max = B->getB(B,0,0);
-	arr = malloc(B->n * sizeof(int));
+	arr = malloc(B->n * sizeof(double));
+	checkAllocation(arr, __LINE__, __FILE__);
 	/*calculating sum of each column */
 	for (i = 0; i < B->n ; ++i) {
 		p = arr;
@@ -83,7 +89,8 @@ double calculateNorm(const struct _modMat *B){
 		}
 		arr++;
 	}
-	return max;
+	free(arr);
+	B->norm = max;
 }
 
 /* getter for B(i,j) when i is the row and j is the column */
@@ -95,9 +102,15 @@ double getB(const struct _modMat *B, int i, int j){
 	return (A_ij - x);
 }
 
-modMat* modMat_allocate(FILE *fInput){
+modMat* modMat_allocate(char *location){
+	FILE *fInput;
 	int n, *numOfNodes;
 	modMat *mat;
+
+	printf("before\n");
+	fInput = fopen(location,"r");
+	checkOpenFile(fInput, location, __LINE__, __FILE__);
+	printf("after\n");
 
 	/* assign memory */
 	mat = malloc(sizeof(modMat));
@@ -107,16 +120,22 @@ modMat* modMat_allocate(FILE *fInput){
     n = fread(&numOfNodes, sizeof(int), 1, fInput);
     checkItemsRead(n,1,__LINE__,__FILE__);
     mat->n = n;
+
     /* create vector k and calculate M */
     mat->k = (int*) calloc(n,sizeof(int));
+    checkAllocation(mat->k, __LINE__, __FILE__);
     countNnz(mat, fInput);
+
     /* create sparse matrix of A form input file */
     createSparseA(mat, fInput);
+
     /* define a getter for B_hat */
     mat->getB = &getB;
+
     /* create vector (f_1,f_2,...,f_n) */
     mat->f = (double*) calloc(n,sizeof(double));
     createF(mat);
+
     /* calculate ||B_hat|| (1-norm of B) */
     calculateNorm(mat);
 
