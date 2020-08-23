@@ -22,10 +22,15 @@ void createMatrixFile(double *values,int n, int m, char *location);
 /* print received vector*/
 void printVector(double *vector, int vectorSize);
 
+void printAllIntValuesFromFIle(FILE *fInput);
+
 /*tester of power iteration*/
 void test1();
 
 /*tester of create matrix*/
 void test2();
+
+/*tester of input file to modMat*/
+void test3();
 
 #endif //SP_PROJECT_HELP_H

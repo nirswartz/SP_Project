@@ -6,6 +6,7 @@
 #include "eigen.h"
 #include "assert.h"
 #include "help.h"
+#include "modMat.h"
 
 /* calc NNZ elements of regular adjacency matrix in file location*/
 int checkNNZ(FILE *fInput, int vectorSize){
@@ -162,6 +163,17 @@ void printVector(double *vector, int vectorSize){
     printf("\n");
 }
 
+void printAllIntValuesFromFIle(FILE *fInput){
+    int value,i=0;
+    rewind(fInput);
+    while(!feof(fInput)){
+        fread(&value, sizeof(int), 1, fInput);
+        printf("%d (i=%d), ",value,i);
+        i++;
+    }
+    printf("\n");
+}
+
 /*tester of power iteration*/
 void test1(){
     char *inputL="C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\input5.arr";
@@ -189,4 +201,11 @@ void test2(){
     char *location="C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\b0.arr";
     createMatrixFile(values,3,1,location);
     printFileMatrix(location);
+}
+
+void test3(){
+    char *f1 = "C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\graph.in";
+    modMat *myMat;
+    myMat = modMat_allocate(f1);
+    printf("%d",myMat->n);
 }
