@@ -16,6 +16,9 @@ typedef struct _modMat {
     double *f;
     /* 1-norm of B^[g] */
     double norm;
+    /* getter */
+    double (*getB)(const struct _modMat *B, int i, int j);
+
 
 } modMat;
 

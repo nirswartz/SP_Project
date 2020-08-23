@@ -26,6 +26,10 @@ typedef struct _spmat {
     /* delete?*/
     void (*printSparse)(struct _spmat *A);
 
+    /* getter */
+    double (*getA)(const struct _spmat *A, int i, int j);
+
+
 } spmat;
 
 /* Allocates a new arrays sparse matrix of size n with nnz non-zero elements */

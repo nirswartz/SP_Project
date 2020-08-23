@@ -64,6 +64,30 @@ void mult(const struct _spmat *A, const double *v, double *result){
     }
 }
 
+/* getter for A(i,j) when i is the row and j is the column */
+double getA(const struct _spmat *A, int i, int j){
+	int x, y , *col;
+
+	x = (A->row)[i+1] - (A->row)[i];
+	if (x == 0){
+		return 0.0;
+	}
+	/*move to the relevant position in column array */
+	col = (A->col) + (A->row)[i];
+
+	/* look for the relevant value */
+	for (y = 0; y < x; ++y) {
+		if (*col > j){
+			break;
+		}
+		else if (*col == j){
+			return *((A->values) + (A->row)[i] + y);
+		}
+		col++;
+	}
+	return 0.0;
+}
+
 double doProductByRow(const struct _spmat *A, int rowNum, const double *v){
     int numberOfElements = A->row[rowNum+1] - A->row[rowNum], i;
     double *valPtr = (A->values)+(A->row[rowNum]), sum = 0;
@@ -78,17 +102,18 @@ double doProductByRow(const struct _spmat *A, int rowNum, const double *v){
 
 spmat* spmat_allocate_array(int n, int nnz){
     spmat *sparse = malloc(sizeof(spmat));
-    checkAllocation(sparse, __LINE__, __FILE__);
+    checkAllocation(sparse, __LINE__,__FILE__);
     sparse->n = n;
     sparse->values = (double*) calloc(nnz,sizeof(double));
-    checkAllocation(sparse->values, __LINE__, __FILE__);
+    checkAllocation(sparse->values, __LINE__,__FILE__);
     sparse->col = (int*) calloc(nnz,sizeof(int));
-    checkAllocation(sparse->col, __LINE__, __FILE__);
+    checkAllocation(sparse->col, __LINE__,__FILE__);
     sparse->row = (int*) calloc(n+1,sizeof(int));
-    checkAllocation(sparse->row, __LINE__, __FILE__);
+    checkAllocation(sparse->row, __LINE__,__FILE__);
     sparse->add_row=&add_row;
     sparse->mult=&mult;
     sparse->free=&freeMat;
+    sparse->getA = &getA;
     sparse->printSparse=&printSparse;
     sparse->doProductByRow=&doProductByRow;
     return sparse;
