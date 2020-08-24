@@ -118,3 +118,43 @@ spmat* spmat_allocate_array(int n, int nnz){
     sparse->doProductByRow=&doProductByRow;
     return sparse;
 }
+
+/*spmat* spmat_allocate_array(int n, int nnz){
+    int error;
+    spmat *sparse = malloc(sizeof(spmat));
+    error=checkAllocation(sparse, __LINE__,__FILE__);
+    if (error!=0){
+        free(sparse);
+        exit(error);
+    }
+    sparse->n = n;
+    sparse->values = (double*) calloc(nnz,sizeof(double));
+    error=checkAllocation(sparse->values, __LINE__,__FILE__);
+    if (error!=0){
+        free(sparse->values);
+        free(sparse);
+        exit(error);
+    }
+    sparse->col = (int*) calloc(nnz,sizeof(int));
+    error=checkAllocation(sparse->col, __LINE__,__FILE__);
+    if (error!=0){
+        free(sparse->values);
+        free(sparse->col);
+        free(sparse);
+        exit(error);
+    }
+    sparse->row = (int*) calloc(n+1,sizeof(int));
+    error=checkAllocation(sparse->row, __LINE__,__FILE__);
+    if (error!=0){
+        freeMat(sparse);
+        free(sparse);
+        exit(error);
+    }
+    sparse->add_row=&add_row;
+    sparse->mult=&mult;
+    sparse->free=&freeMat;
+    sparse->getA = &getA;
+    sparse->printSparse=&printSparse;
+    sparse->doProductByRow=&doProductByRow;
+    return sparse;
+}*/

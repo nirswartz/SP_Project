@@ -5,6 +5,7 @@
 #include "errors.h"
 #include "spmat.h"
 #include "help.h"
+#include "modMat.h"
 
 double epsilon = 0.00001;
 
@@ -60,6 +61,7 @@ int bigDifference(double *b, double* bNew, int rowLength){
     return 0;
 }
 
+/* find leading eigenvector. result will be placed in vector */
 void powerIteration(spmat *matrix, double *vector)
 {
     int		flag=1, vectorSize=matrix->n,i;

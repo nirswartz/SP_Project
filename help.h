@@ -36,4 +36,6 @@ void test2();
 /*tester of input file to modMat*/
 void test3();
 
+/*tester of linkedList*/
+void test4();
 #endif

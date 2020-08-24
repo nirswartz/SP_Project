@@ -7,6 +7,7 @@
 #include "assert.h"
 #include "help.h"
 #include "modMat.h"
+#include "linkedList.h"
 
 /*
 #define NIR_INPUT\ C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\
@@ -226,4 +227,57 @@ void test3() {
     char *f1 = "C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\graph5.in";
     modMat *myMat;
     myMat = modMat_allocate(f1);
+}
+
+/*tester of linkedList*/
+void test4(){
+    /*linkedList *l1=linkedList_allocate();
+    int* arr1[5]={1,2,3,4,5};
+    int* arr2[4]={10,20,30,40};
+    int* arr3[2]={1000,2000};
+    int* arr4[0]={};
+    int* arr5=calloc(3,sizeof(int));
+    arr5[0]=-1;
+    arr5[1]=-2;
+    arr5[2]=-3;
+    int* ar1,*ar2, s1, s2;
+    l1->insert_first(l1,arr1,5);
+    l1->insert_first(l1,arr2,4);
+    l1->insert_last(l1,arr3,2);
+    l1->insert_last(l1,arr4,0);
+    l1->insert_last(l1,arr5,3);
+    l1->printList(l1);
+    printf("\n");
+
+    printVectorInt(l1->head->data,l1->head->size);
+    printf("\n");
+
+    l1->delete_first(l1,0);
+    l1->printList(l1);
+    printf("\n");
+
+    ar1=l1->head->data;
+    s1=l1->head->size;
+    printVectorInt(ar1,s1);
+    l1->delete_first(l1,1);
+    printVectorInt(ar1,s1);
+    l1->printList(l1);
+    printf("\n");
+
+    ar2=l1->tail->data;
+    s2=l1->tail->size;
+    printVectorInt(ar2,s2);
+    l1->delete_last(l1,0);
+    printVectorInt(ar2,s2);
+    l1->printList(l1);
+    printf("\n");
+
+    l1->delete_last(l1,0);
+    l1->printList(l1);
+    printf("\n");
+
+    l1->delete_last(l1,1);
+    printf("done\n");
+    l1->printList(l1);
+*/
 }
