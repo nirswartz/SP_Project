@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "help.h"
+#include "eigen.h"
 
 /* calculate k vector and M (nnz) */
 void countNnz(struct _modMat *B, FILE *fInput){
@@ -125,7 +126,7 @@ void vectorSubtraction(double *res, double *v, int vectorLen){
 
 /* for v0 = (v0_1,...,v0_n) and v1 = (v1_1,...,v1_n) res = (v0_1*v1_1,...,v0_n*v1_n)*/
 /* result of addition will be placed in res vector */
-void vectorMult(double *v0, double *v1, double *res, int vectorLen){
+void vectorMult(const double *v0, const double *v1, double *res, int vectorLen){
 	int i;
 	for (i = 0; i < vectorLen; ++i) {
 		*res = *v0 * *v1;
@@ -137,7 +138,7 @@ void vectorMult(double *v0, double *v1, double *res, int vectorLen){
 
 /* for v = (v_1,...,v_n) and scalar res = (v_1*scalar,...,v_n*scalar)*/
 /* result will be placed in res vector */
-void vectorScalarMult(double *v, double scalar, double *res, int vectorLen){
+void vectorScalarMult(const double *v, double scalar, double *res, int vectorLen){
 	int i;
 	for (i = 0; i < vectorLen; ++i) {
 		*res += (scalar * (*v));
@@ -149,7 +150,6 @@ void vectorScalarMult(double *v, double scalar, double *res, int vectorLen){
 /* B_hat[g]*v = A[g]*v - (k^T*v*k)/M - f*I*v + ||B_hat[g]||*I*v */
 void multB_hat(const struct _modMat *B, const double *v, double *result){
 	double *tmp, scalar;
-	int i;
 	tmp = calloc(B->n,sizeof(double));
 	checkAllocation(tmp, __LINE__,__FILE__);
 
