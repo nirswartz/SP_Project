@@ -81,39 +81,20 @@ double getB(const modMat *B, int i, int j){
 }
 
 /* getter for B^(i,j) when i is the row and j is the column */
-double getHatB(const modMat *B, int i, int j){
+double getHatB(const modMat *B, int i, int j, int *g, int gLen, double *f){
     double B_ij, x=0;
+    int y;
     B_ij = B->getB(B,i,j);
     /*calculate B_ij-delta_ij*f_i */
     if(i==j){
-        x=B->f[i];
+        for (y = 0; y < gLen; ++y) {
+            if(*g == i){
+                x = f[y];
+            }
+            g++;
+        }
     }
     return (B_ij - x);
-}
-
-/* calculating 1-norm of B_hat using getter of B */
-void calculateNorm(modMat *B){
-    int i, j;
-    double *arr, *p, max = B->getHatB(B,0,0);
-    arr = calloc(B->n,sizeof(double));
-    checkAllocation(arr, __LINE__, __FILE__);
-    /*calculating sum of each column */
-    for (i = 0; i < B->n ; ++i) {
-        p = arr;
-        for (j = 0; j < B->n ; ++j) {
-            *p += B->getHatB(B,i,j);
-            p++;
-        }
-    }
-    /* finding maximal sum of all columns */
-    for (i = 0; i < B->n ; ++i) {
-        if(*arr > max){
-            max = *arr;
-        }
-        arr++;
-    }
-    free(arr);
-    B->norm = max;
 }
 
 void printA(modMat *B){
@@ -139,7 +120,7 @@ void printB(modMat *B){
         printf("%.3f }\n",B->getB(B,i,j));
     }
 }
-
+/*
 void printHatB(modMat *HatB){
     int i,j;
     printf("Hat B matrix is:\n");
@@ -151,7 +132,7 @@ void printHatB(modMat *HatB){
         printf("%.3f }\n",HatB->getHatB(HatB,i,j));
     }
 }
-
+*/
 /* for v = (v_1,...,v_n) and res = (r_1,...,r_n) vectorAddition(res,v) = (v_1+r_1,...,v_n+r_n)*/
 /* result of addition will be placed in res vector */
 void vectorAddition(double *res, double *v, int vectorLen){
@@ -197,7 +178,7 @@ void vectorScalarMult(const double *v, double scalar, double *res, int vectorLen
 }
 
 /* B_hat[g]*v = A[g]*v - (k^T*v*k)/M - f*I*v + ||B_hat[g]||*I*v */
-void multB_hat(const struct _modMat *B, const double *v, double *result){
+void multB_hat(const struct _modMat *B, const double *v, double *result, int *g, int gLen){
     double *tmp, scalar;
     tmp = calloc(B->n,sizeof(double));
     checkAllocation(tmp, __LINE__,__FILE__);
@@ -224,6 +205,59 @@ void multB_hat(const struct _modMat *B, const double *v, double *result){
     vectorAddition(result, tmp, B->n);
 
     free(tmp);
+}
+
+/* create vector (f_1,f_2,...,f_gLen) , result will be placed in f */
+void fCalc(const modMat *B, double *f, int *g, int gLen){
+    int i,j, *gOut = g, *gIn = g;
+    double sum;
+
+    for (i = 0; i < gLen ; ++i) {
+        sum = 0;
+        for (j = 0; j < gLen ; ++j) {
+            sum += B->getB(B,*gOut,*gIn);
+            gIn++;
+        }
+        *f = sum;
+        f++;
+        gOut++;
+        gIn = g;
+    }
+}
+
+double normCalc(const struct _modMat *B, int *g, int gLen){
+    int i, j, *gOut = g, *gIn;
+    double *arr, *p, max, *f;
+
+    /* create f according to g */
+    f = calloc(gLen,sizeof(double));
+    checkAllocation(f, __LINE__, __FILE__);
+    fCalc(B, f, g, gLen);
+    printVectorDouble(f,gLen);
+
+    arr = calloc(gLen,sizeof(double));
+    checkAllocation(arr, __LINE__, __FILE__);
+    /*calculating sum of each column - each cell in arr is the sum of a different column */
+    for (i = 0; i < gLen ; ++i) {
+        p = arr;
+        gIn = g;
+        for (j = 0; j < gLen ; ++j) {
+            *p += B->getHatB(B,*gOut,*gIn,g,gLen,f);
+            gIn++;
+            p++;
+        }
+        gOut++;
+    }
+    /* finding maximal sum of all columns */
+    max = *arr;
+    for (i = 0; i < gLen ; ++i) {
+        if(*arr > max){
+            max = *arr;
+        }
+        arr++;
+    }
+    free(arr);
+    return max;
 }
 
 modMat* modMat_allocate(char *location){
@@ -261,12 +295,10 @@ modMat* modMat_allocate(char *location){
     /* define a getter for B^ */
     mat->getHatB= &getHatB;
 
-    /* calculate ||B_hat|| (1-norm of B) */
-    calculateNorm(mat);
-
     /*define mult function for B^*/
     mat->multB_hat=&multB_hat;
 
     fclose(fInput);
     return mat;
 }
+
