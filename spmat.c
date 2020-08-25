@@ -63,8 +63,8 @@ void mult(const struct _spmat *A, const double *v, double *result, int *g, int g
     }
 }
 
-/*
-void mult(const struct _spmat *A, const double *v, double *result, int *g, int gLen){
+
+/*void mult(const struct _spmat *A, const double *v, double *result, int *g, int gLen){
     int i,j,sum;
     for(i=0;i<gLen;i++) {
         sum=0;

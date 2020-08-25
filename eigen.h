@@ -1,6 +1,7 @@
 #ifndef SP_PROJECT_EIGEN_H
 #define SP_PROJECT_EIGEN_H
-#include "spmat.h"
+#include "modMat.h"
+
 
 /*create b0, fill it with random values*/
 void initialization(double *arr, int rowLength);
@@ -19,6 +20,6 @@ void nextVector(spmat *matrix, double* b, double* bNew, int rowLength);
 int bigDifference(double *b, double* bNew, int rowLength);
 
 /*calculating dominant eigen vector */
-void powerIteration(spmat *matrix, double *vector, int *g);
+void powerIteration(modMat *B, double *vector, int *g, int gLen);
 
 #endif

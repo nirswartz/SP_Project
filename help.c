@@ -308,6 +308,21 @@ void test6(){
     printf("hi\n");
     myMat = modMat_allocate(f1);
     printB(myMat);
-    norm = normCalc(myMat, g, 3);
+    /*norm = normCalc(myMat, g, 3);*/
     printf("norm function is: %f", norm);
+}
+
+/*test mult b^*/
+void test7(){
+    char *f1 = "C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\graph5.in";
+    modMat *myMat;
+    double norm;
+    int g[3]={1,2,4};
+    double v[3]={5.0,0.0,2.0};
+    double *result=calloc(3, sizeof(double));
+    myMat = modMat_allocate(f1);
+    printB(myMat);
+    myMat->updateB_Hat(myMat,g,3);
+    myMat->multB_hat(myMat,v,result,g,3);
+    printVectorDouble(result,3);
 }

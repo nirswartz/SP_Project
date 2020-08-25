@@ -152,46 +152,49 @@ void vectorMult(const double *v0, const double *v1, double *res, int vectorLen){
     }
 }
 
+/*calculating dot product of two rows by g on first vector only!*/
+double dotProductByG(const int* row1,const double* row2,int *g, int gLen){
+    int i;
+    double sum=0;
+    for(i=0; i<gLen; i++){
+        sum += ((*(row1+*g)) * (*(row2)));
+        g++;
+        row2++;
+    }
+    return sum;
+}
+
+/* for v = (v_1,...,v_n) and scalar res = (v_1*scalar,...,v_n*scalar) according g on first vector only!*/
+/* result will be placed in res vector */
+void vectorScalarMultByG(const int *v, double scalar, double *res, int *g,int gLen){
+    int i;
+    for (i = 0; i < gLen; ++i) {
+        *res = (scalar * (*(v+*g)));
+        res++;
+        g++;
+    }
+}
+
 /* for v = (v_1,...,v_n) and scalar res = (v_1*scalar,...,v_n*scalar)*/
 /* result will be placed in res vector */
-void vectorScalarMult(const double *v, double scalar, double *res, int vectorLen){
+void vectorScalarMult(const double *v, double scalar, double *res,int gLen){
     int i;
-    for (i = 0; i < vectorLen; ++i) {
-        *res += (scalar * (*v));
+    for (i = 0; i < gLen; ++i) {
+        *res = (scalar * (*v));
         res++;
         v++;
     }
 }
 
-/* B_hat[g]*v = A[g]*v - (k^T*v*k)/M - f*I*v + ||B_hat[g]||*I*v */
-void multB_hat(const struct _modMat *B, const double *v, double *result, int *g, int gLen){
-    double *tmp, scalar;
-    tmp = calloc(B->n,sizeof(double));
-    checkAllocation(tmp, __LINE__,__FILE__);
-
-    /* calculating A*v */
-    B->A->mult(B->A,v,tmp,g,gLen);
-    /*add tmp to result*/
-    vectorAddition(result, tmp, B->n);
-
-    /* calculating ((k^T*v)/M)* k */
-    scalar = (dotProduct(B->k, v, B->n)) / B->M;
-    vectorScalarMult(B->k, scalar, tmp, B->n);
-    /*add tmp to result*/
-    vectorSubtraction(result, tmp, B->n);
-
-    /* calculating f*I*v */
-    /*vectorMult(B->f, v, tmp, B->n);*/
-    /*add tmp to result*/
-    vectorSubtraction(result, tmp, B->n);
-
-    /* calculating ||B_hat||*v */
-    vectorScalarMult(v, normCalc(B,g,gLen), tmp, B->n);
-    /*add tmp to result*/
-    vectorAddition(result, tmp, B->n);
-
-    free(tmp);
-}
+/* calculate sum(k_1+k_2+...+k_n) = nnz = M according to g
+int calcM(const modMat *B, int *g, int gLen){
+    int i,sum;
+    for(i=0;i<gLen;i++){
+        sum+=(B->k)[*g];
+        g++;
+    }
+    return sum;
+}*/
 
 /* create vector (f_1,f_2,...,f_gLen) , result will be placed in f */
 void fCalc(const modMat *B, double *f, int *g, int gLen){
@@ -211,15 +214,9 @@ void fCalc(const modMat *B, double *f, int *g, int gLen){
     }
 }
 
-double normCalc(const struct _modMat *B, int *g, int gLen){
+double normCalc(const struct _modMat *B, int *g, int gLen, double *f){
     int i, j, *gOut = g, *gIn;
-    double *arr, *p, max, *f;
-
-    /* create f according to g */
-    f = calloc(gLen,sizeof(double));
-    checkAllocation(f, __LINE__, __FILE__);
-    fCalc(B, f, g, gLen);
-    printVectorDouble(f,gLen);
+    double *arr, *p, max;
 
     arr = calloc(gLen,sizeof(double));
     checkAllocation(arr, __LINE__, __FILE__);
@@ -235,16 +232,60 @@ double normCalc(const struct _modMat *B, int *g, int gLen){
         gOut++;
     }
     /* finding maximal sum of all columns */
-    max = *arr;
+    p=arr;
+    max = *p;
     for (i = 0; i < gLen ; ++i) {
-        if(*arr > max){
-            max = *arr;
+        if(*p > max){
+            max = *p;
         }
-        arr++;
+        p++;
     }
     free(arr);
     return max;
 }
+
+/*Calc f vector and norm according to g*/
+void updateB_Hat(struct _modMat *B, int *g, int gLen){
+    /* create f according to g */
+    if(B->last_f != NULL){
+        free(B->last_f);
+    }
+    B->last_f = calloc(gLen,sizeof(double));
+    checkAllocation(B->last_f, __LINE__, __FILE__);
+    fCalc(B, B->last_f, g, gLen);
+    B->last_norm = normCalc(B,g,gLen,B->last_f);
+}
+
+/* B_hat[g]*v = A[g]*v - (k^T*v*k)/M - f*I*v + ||B_hat[g]||*I*v */
+void multB_hat(const struct _modMat *B, const double *v, double *result, int *g, int gLen){
+    double *tmp, scalar, *f, norm;
+    tmp = calloc(gLen,sizeof(double));
+    checkAllocation(tmp, __LINE__,__FILE__);
+    f=B->last_f;
+
+    /* calculating A*v */
+    B->A->mult(B->A,v,tmp,g,gLen);
+    /*add tmp to result*/
+    vectorAddition(result, tmp, gLen);
+
+    /* calculating ((k^T*v)/M)* k */
+    scalar = (dotProductByG(B->k, v, g,gLen)) / B->M;
+    vectorScalarMultByG(B->k, scalar, tmp,g, gLen);
+    /*add tmp to result*/
+    vectorSubtraction(result, tmp, gLen);
+
+    /* calculating f*I*v */
+    vectorMult(f, v, tmp, gLen);
+    /*add tmp to result*/
+    vectorSubtraction(result, tmp, gLen);
+
+    /* calculating ||B_hat||*v */
+    vectorScalarMult(v,B->last_norm, tmp, gLen);
+    /*add tmp to result*/
+    vectorAddition(result, tmp, gLen);
+    free(tmp);
+}
+
 
 modMat* modMat_allocate(char *location){
     FILE *fInput;
@@ -268,6 +309,10 @@ modMat* modMat_allocate(char *location){
     checkAllocation(mat->k, __LINE__, __FILE__);
     countNnz(mat, fInput);
 
+    /*initialize f vector and norm*/
+    mat->last_norm=0;
+    mat->last_f=NULL;
+
     /* create sparse matrix of A form input file */
     createSparseA(mat, fInput);
 
@@ -276,6 +321,9 @@ modMat* modMat_allocate(char *location){
 
     /* define a getter for B^ */
     mat->getHatB= &getHatB;
+
+    /*define function for updating f vector and norm according to g*/
+    mat->updateB_Hat=&updateB_Hat;
 
     /*define mult function for B^*/
     mat->multB_hat=&multB_hat;
