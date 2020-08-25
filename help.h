@@ -41,4 +41,6 @@ void test4();
 
 /*tester of new sparse mult: A[g]*b */
 void test5();
+
+void test6();
 #endif

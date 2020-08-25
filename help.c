@@ -90,7 +90,7 @@ void calcEigenVectorAndWrite(spmat *matrix, char *location){
     checkAllocation(eigenVector,__LINE__,__FILE__);
 
     /*calc eigen with power iteration*/
-    powerIteration(matrix,eigenVector);
+    /*powerIteration(matrix,eigenVector);*/
 
     /* write eigenvector with greatest eigenvalue into output file */
     n =fwrite(&flag, sizeof(int), 1, fOutput);
@@ -286,7 +286,7 @@ void test4(){
 void test5(){
     int i;
     double arr[5][5] = {{0,1,1,0,0},{1,0,1,1,0},{1,1,0,0,1},{0,1,0,0,1},{0,0,1,1,0}};
-    double v[5] = {5,0,2};
+    double v[3] = {5,0,2};
     int g[3]={1,2,4};
     double res[3];
     spmat *mys = NULL;
@@ -298,4 +298,16 @@ void test5(){
 
     mys->mult(mys,v,res,g,3);
     printVectorDouble(res,3);
+}
+
+void test6(){
+    char *f1 = "C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\graph5.in";
+    modMat *myMat;
+    double norm;
+    int g[3]={1,2,4};
+    printf("hi\n");
+    myMat = modMat_allocate(f1);
+    printB(myMat);
+    norm = normCalc(myMat, g, 3);
+    printf("norm function is: %f", norm);
 }
