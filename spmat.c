@@ -47,7 +47,35 @@ void freeMat(struct _spmat *A){
 }
 
 
-void mult(const struct _spmat *A, const double *v, double *result){
+void mult(const struct _spmat *A, const double *v, double *result, int *g, int gLen){
+    int i,j,l, *colPtr = A->col, *rowPtr=A->row,index, elementsInRow,sum;
+    double *valPtr=A->values;
+    for(i=0; i<gLen; i++) {
+        index = g[i];
+        sum=0;
+        elementsInRow=(*(rowPtr + index + 1) - *(rowPtr + index));
+        if (elementsInRow == 0) {
+            result[i] = 0;
+        } else {
+            valPtr=valPtr+rowPtr[index];
+            colPtr=colPtr+rowPtr[index];
+            for (j = 0; j < elementsInRow; j++) {
+                for(l=0;l<gLen;l++){
+                    if(colPtr[j]==g[l]){
+                        sum+=(valPtr[j]*v[l]);
+                        break;
+                    }
+                }
+                if(colPtr[j]>g[gLen-1]){
+                    break;
+                }
+            }
+            result[i]=sum;
+        }
+    }
+}
+
+/*void mult(const struct _spmat *A, const double *v, double *result){
     int *p1 = A->row, *p2 = (A->row)+1,i,j, *colPtr = A->col;
     double *valPtr = A->values, sum;
     for (i = 0; i < (A->n); ++i) {
@@ -62,7 +90,7 @@ void mult(const struct _spmat *A, const double *v, double *result){
         p1++;
         p2++;
     }
-}
+}*/
 
 /* getter for A(i,j) when i is the row and j is the column */
 double getA(const struct _spmat *A, int i, int j){

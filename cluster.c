@@ -40,7 +40,7 @@ void initializationOfGroups(linkedList *O, linkedList *P, int n){
     /*Creating the trivial division of {1,2,...,n}*/
     trivial=(int*)malloc(n * sizeof(int));
     checkAllocation(trivial,__LINE__,__FILE__);
-    for(i=1;i<=n;i++){
+    for(i=0;i<n;i++){
         trivial[i]=i;
     }
 
@@ -49,8 +49,7 @@ void initializationOfGroups(linkedList *O, linkedList *P, int n){
     P->insert_first(P,trivial,n);
 }
 
-int main(int argc, char* argv[]){
-    /*declare all variables here*/
+int tmp(int argc, char* argv[]){
     char *locationInput, *locationOutput;
     FILE *fInput;
     int numOfNodes,check, *g,*g1,*g2, gLen, size_g1, size_g2, **division;
@@ -62,6 +61,10 @@ int main(int argc, char* argv[]){
     /*division[0]=g1, division[1]=g2, division[2]=size(g1), division[3]=size(g2)*/
     division=calloc(4, sizeof(int*));
     checkAllocation(division,__LINE__,__FILE__);
+    division[2]=calloc(1, sizeof(int));
+    checkAllocation(division[2],__LINE__,__FILE__);
+    division[3]=calloc(1, sizeof(int));
+    checkAllocation(division[3],__LINE__,__FILE__);
 
     /*Creating matrix B*/
     modMat *B=modMat_allocate(locationInput);
@@ -126,4 +129,9 @@ int main(int argc, char* argv[]){
 
     return 0;
 
+}
+
+int main(){
+    test5();
+    return 0;
 }

@@ -3,6 +3,6 @@
 #include "modMat.h"
 
 /*Divide a group g into two groups g1,g2 like in Algorithm 2*/
-int* calcTwoDivision(modMat *B, int *arr, int *g);
+void calcTwoDivision(modMat *B, int **division, int *g);
 
 #endif

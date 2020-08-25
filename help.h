@@ -38,4 +38,7 @@ void test3();
 
 /*tester of linkedList*/
 void test4();
+
+/*tester of new sparse mult: A[g]*b */
+void test5();
 #endif

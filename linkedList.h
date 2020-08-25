@@ -22,7 +22,7 @@ typedef struct _linkedList{
     void  (*delete_first)(struct _linkedList *list, int contentFlag);
 
     /*Delete the last node from the list. If contentFlag==1, so the data will be deleted as well*/
-    /*O(n)!*/
+    /*O(n)! no need????????????????*/
     void  (*delete_last)(struct _linkedList *list, int contentFlag);
 
     /*void (*deleteNode)(struct _linkedList *list, node nodeDelete);*/

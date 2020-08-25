@@ -62,7 +62,7 @@ int bigDifference(double *b, double* bNew, int rowLength){
 }
 
 /* find leading eigenvector. result will be placed in vector */
-void powerIteration(spmat *matrix, double *vector)
+void powerIteration(spmat *matrix, double *vector, int *g)
 {
     int		flag=1, vectorSize=matrix->n,i;
     double  *b, *bNew, *tmp ,norm;

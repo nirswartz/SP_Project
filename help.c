@@ -281,3 +281,21 @@ void test4(){
     l1->printList(l1);
 */
 }
+
+/*tester of new sparse mult: A[g]*b */
+void test5(){
+    int i;
+    double arr[5][5] = {{0,1,1,0,0},{1,0,1,1,0},{1,1,0,0,1},{0,1,0,0,1},{0,0,1,1,0}};
+    double v[5] = {5,0,2};
+    int g[3]={1,2,4};
+    double res[3];
+    spmat *mys = NULL;
+
+    mys=spmat_allocate_array(5,12);
+    for (i = 0; i < 5; ++i) {
+        mys->add_row(mys, arr[i], i);
+    }
+
+    mys->mult(mys,v,res,g,3);
+    printVectorDouble(res,3);
+}

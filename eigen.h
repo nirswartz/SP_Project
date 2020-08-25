@@ -19,6 +19,6 @@ void nextVector(spmat *matrix, double* b, double* bNew, int rowLength);
 int bigDifference(double *b, double* bNew, int rowLength);
 
 /*calculating dominant eigen vector */
-void powerIteration(spmat *matrix, double *vector);
+void powerIteration(spmat *matrix, double *vector, int *g);
 
 #endif
