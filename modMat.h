@@ -12,10 +12,6 @@ typedef struct _modMat {
     int	*k;
     /* sum(k_1+k_2+...+k_n) also equals to non zero elements in A (nnz) */
     int M;
-    /* vector of (f_1,f_2,...,f_n) */
-    double *f;
-    /* 1-norm of B^[g] */
-    double norm;
     /* getter for B(i,j)  */
     double (*getB)(const struct _modMat *B, int i, int j);
     /* getter for B^(i,j) */
@@ -35,10 +31,9 @@ double normCalc(const struct _modMat *B, int *g, int gLen);
 /* calculate vector (f_1,f_2,...,f_gLen) according to g */
 void fCalc(const modMat *B, double *f, int *g, int gLen);
 
-
 void printB(modMat *B);
 
-void printHatB(modMat *HatB);
+/*void printHatB(modMat *HatB);*/
 
 
 

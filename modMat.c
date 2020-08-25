@@ -56,21 +56,6 @@ void createSparseA(modMat *B, FILE *fInput){
     }
 }
 
-/* create vector (f_1,f_2,...,f_n) */
-void createF(modMat *B){
-    int i,j;
-    double sum, *f = B->f;
-
-    for (i = 0; i < B->n ; ++i) {
-        sum = 0;
-        for (j = 0; j < B->n ; ++j) { /*  g - àí îçùáéí òáåø àéðã÷ñéí ñôöéôééí ìùðåú ëàï!!! */
-            sum += B->getB(B,i,j);
-        }
-        *f = sum;
-        f++;
-    }
-}
-
 /* getter for B(i,j) when i is the row and j is the column */
 double getB(const modMat *B, int i, int j){
     double A_ij, x;
@@ -131,8 +116,9 @@ void printHatB(modMat *HatB){
         }
         printf("%.3f }\n",HatB->getHatB(HatB,i,j));
     }
-}
-*/
+}*/
+
+
 /* for v = (v_1,...,v_n) and res = (r_1,...,r_n) vectorAddition(res,v) = (v_1+r_1,...,v_n+r_n)*/
 /* result of addition will be placed in res vector */
 void vectorAddition(double *res, double *v, int vectorLen){
@@ -184,7 +170,7 @@ void multB_hat(const struct _modMat *B, const double *v, double *result, int *g,
     checkAllocation(tmp, __LINE__,__FILE__);
 
     /* calculating A*v */
-    B->A->mult(B->A,v,tmp);
+    B->A->mult(B->A,v,tmp,g,gLen);
     /*add tmp to result*/
     vectorAddition(result, tmp, B->n);
 
@@ -195,12 +181,12 @@ void multB_hat(const struct _modMat *B, const double *v, double *result, int *g,
     vectorSubtraction(result, tmp, B->n);
 
     /* calculating f*I*v */
-    vectorMult(B->f, v, tmp, B->n);
+    /*vectorMult(B->f, v, tmp, B->n);*/
     /*add tmp to result*/
     vectorSubtraction(result, tmp, B->n);
 
     /* calculating ||B_hat||*v */
-    vectorScalarMult(v, B->norm, tmp, B->n);
+    vectorScalarMult(v, normCalc(B,g,gLen), tmp, B->n);
     /*add tmp to result*/
     vectorAddition(result, tmp, B->n);
 
@@ -287,10 +273,6 @@ modMat* modMat_allocate(char *location){
 
     /* define a getter for B*/
     mat->getB = &getB;
-
-    /* create vector (f_1,f_2,...,f_n) */
-    mat->f = (double*) calloc(numOfNodes,sizeof(double));
-    createF(mat);
 
     /* define a getter for B^ */
     mat->getHatB= &getHatB;
