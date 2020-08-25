@@ -46,8 +46,18 @@ void freeMat(struct _spmat *A){
     free(A->row);
 }
 
-
 void mult(const struct _spmat *A, const double *v, double *result, int *g, int gLen){
+    int i,j,sum;
+    for(i=0;i<gLen;i++) {
+        sum=0;
+        for (j = 0; j < gLen; j++) {
+            sum+=((A->getA(A,g[i],g[j]))*v[j]);
+        }
+        result[i]=sum;
+    }
+}
+
+/*void mult(const struct _spmat *A, const double *v, double *result, int *g, int gLen){
     int i,j,l, *colPtr = A->col, *rowPtr=A->row,index, elementsInRow,sum;
     double *valPtr=A->values;
     for(i=0; i<gLen; i++) {
@@ -73,7 +83,7 @@ void mult(const struct _spmat *A, const double *v, double *result, int *g, int g
             result[i]=sum;
         }
     }
-}
+}*/
 
 /*void mult(const struct _spmat *A, const double *v, double *result){
     int *p1 = A->row, *p2 = (A->row)+1,i,j, *colPtr = A->col;
