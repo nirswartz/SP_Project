@@ -3,6 +3,7 @@
 #include "eigen.h"
 #include "modMat.h"
 #include "errors.h"
+#include "maximization.h"
 
 void createS(double *eigenvector, int *s, int vectorSize){
     int i;
@@ -23,8 +24,17 @@ double computeEigenvalue(modMat *B ,double *eigenvector){
     return 0.0;
 }
 
+double computeDeltaQ(modMat *B, int *s, int *g){
+    return 0.0;
+}
 
-int* Algorithm2(modMat *B, int *arr, int *g){
+/*Divide the vertices in g into two groups g1,g2 according to s where division[0]=g1 and division[1]=g2*/
+void makeDivision(int *division,int *s, int *g){
+
+}
+
+/*Divide a group g into two groups g1,g2 like in Algorithm 2*/
+int* calcTwoDivision(modMat *B, int *arr, int *g){
     double *eigenvector, lambda, Q;
     int *s, division[2];
 
@@ -49,9 +59,10 @@ int* Algorithm2(modMat *B, int *arr, int *g){
         /*return NULL;*/
     }
 
-    maximization(B,s);
+    maxDivision(B, s, g);
 
     /* stage 5 - divide s into g_1 and g_2 */
-    makeDivision(division);
+    makeDivision(division,s, g);
+
     return division;
 }
