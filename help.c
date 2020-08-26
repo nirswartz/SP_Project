@@ -326,3 +326,10 @@ void test7(){
     myMat->multB_hat(myMat,v,result,g,3);
     printVectorDouble(result,3);
 }
+/* make same graph as given by Moshe */
+void test8(){
+    int values[103]={20,2,2,4,3,2,3,4,5,0,1,4,5,6,5,1,4,5,6,11,7,0,1,2,3,5,6,7,4,2,3,4,15,3,2,3,4,5,4,8,10,11,12,5,7,10,11,13,16,3,10,12,13,6,7,8,9,11,12,14,4,3,7,8,10,4,7,9,10,14,4,8,9,14,18,3,10,12,13,4,5,16,17,19,5,8,15,17,18,19,4,15,16,18,19,3,13,16,17,3,15,16,17};
+    char *location="C://project//graph.in";
+    createMatrixFile(values,103,1,location);
+    printAllIntValuesFromFIle(location);
+}

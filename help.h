@@ -45,4 +45,8 @@ void test5();
 void test6();
 
 void test7();
+
+/* make same graph as given by Moshe */
+void test8();
+
 #endif

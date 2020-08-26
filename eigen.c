@@ -77,9 +77,6 @@ void powerIteration(modMat *B, double *vector, int *g, int gLen)
     bNew = calloc(gLen,sizeof(double));
     checkAllocation(bNew, __LINE__,__FILE__);
 
-    /*Update f vector and norm of new B^[g]*/
-    B->updateB_Hat(B,g,gLen);
-
     /*start iterations - if difference bigger than epsilon continue, else stop iterating*/
     while(flag == 1)
     {
