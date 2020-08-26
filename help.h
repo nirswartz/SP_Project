@@ -49,4 +49,7 @@ void test7();
 /* make same graph as given by Moshe */
 void test8();
 
+/* test the graft as given by Moshe*/
+void test9();
+
 #endif

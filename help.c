@@ -150,10 +150,10 @@ void createMatrixFile(int *values,int n, int m, char *location){
     fOutput = fopen(location, "w");
     checkOpenFile(fOutput, location ,__LINE__,__FILE__ );
 
-   /* check =fwrite(&m, sizeof(int), 1, fOutput);
-    assert(check==1);
-    check =fwrite(&n, sizeof(int), 1, fOutput);
-    assert(check==1);*/
+    /* check =fwrite(&m, sizeof(int), 1, fOutput);
+     assert(check==1);
+     check =fwrite(&n, sizeof(int), 1, fOutput);
+     assert(check==1);*/
     for(i=0;i<m;i++){
         check = fwrite(values, sizeof(int), n, fOutput);
         assert(check==n);
@@ -248,14 +248,11 @@ void test4(){
     l1->insert_last(l1,arr5,3);
     l1->printList(l1);
     printf("\n");
-
     printVectorInt(l1->head->data,l1->head->size);
     printf("\n");
-
     l1->delete_first(l1,0);
     l1->printList(l1);
     printf("\n");
-
     ar1=l1->head->data;
     s1=l1->head->size;
     printVectorInt(ar1,s1);
@@ -263,7 +260,6 @@ void test4(){
     printVectorInt(ar1,s1);
     l1->printList(l1);
     printf("\n");
-
     ar2=l1->tail->data;
     s2=l1->tail->size;
     printVectorInt(ar2,s2);
@@ -271,11 +267,9 @@ void test4(){
     printVectorInt(ar2,s2);
     l1->printList(l1);
     printf("\n");
-
     l1->delete_last(l1,0);
     l1->printList(l1);
     printf("\n");
-
     l1->delete_last(l1,1);
     printf("done\n");
     l1->printList(l1);
@@ -329,7 +323,15 @@ void test7(){
 /* make same graph as given by Moshe */
 void test8(){
     int values[103]={20,2,2,4,3,2,3,4,5,0,1,4,5,6,5,1,4,5,6,11,7,0,1,2,3,5,6,7,4,2,3,4,15,3,2,3,4,5,4,8,10,11,12,5,7,10,11,13,16,3,10,12,13,6,7,8,9,11,12,14,4,3,7,8,10,4,7,9,10,14,4,8,9,14,18,3,10,12,13,4,5,16,17,19,5,8,15,17,18,19,4,15,16,18,19,3,13,16,17,3,15,16,17};
-    char *location="C://project//graph.in";
+    char *location="C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\graph20.in";
     createMatrixFile(values,103,1,location);
     printAllIntValuesFromFIle(location);
+}
+
+/* test the graft as given by Moshe*/
+void test9(){
+    char *location="C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\graph20.in";
+    modMat *B=modMat_allocate(location);
+    B->A->printSparse(B->A);
+    printB(B);
 }

@@ -3,6 +3,6 @@
 #include "modMat.h"
 
 /*Maximize the division from Algorithm 2 like in Algorithm 4*/
-void maxDivision(modMat *B, int *s, int *g);
+void maxDivision(modMat *B, double *s, int *g, int gLen);
 
 #endif
