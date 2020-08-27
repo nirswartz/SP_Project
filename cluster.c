@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "help.h"
+/*#include "help.h"*/
 #include "errors.h"
 #include "linkedList.h"
 #include "divide.h"
 #include "modMat.h"
-#include "cluster.h" /*$$$$$$$$$$$ to delete 444444444444*/
+/*#include "cluster.h" *//*$$$$$$$$$$$ to delete 444444444444*/
 
 void writeGroupsToFile(linkedList *O, char *locationOutput){
     FILE *fOutput;
@@ -47,12 +47,19 @@ void initializationOfGroups(linkedList *O, linkedList *P, int n){
     P->insert_first(P,trivial,n); /* P = {{0,...,n-1}}, O = {} */
 }
 
-int cluster(int argc, char* argv[]){ /* change to main and delete cluster.h!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+/*int cluster(int argc, char* argv[]){ /* change to main and delete cluster.h!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+int main(int argc, char* argv[]){
     char *locationInput, *locationOutput;
     FILE *fInput;
     int numOfNodes,check, *g,*g1,*g2, gLen, size_g1, size_g2, **division;
     linkedList *O, *P;
     modMat *B;
+
+
+    /*timing*/
+    clock_t t;
+    double time_taken, vertexes;
+    t = clock();
 
     locationInput = argv[1];
     locationOutput = argv[2];
@@ -125,8 +132,13 @@ int cluster(int argc, char* argv[]){ /* change to main and delete cluster.h!!!!!
     /* Stage 4 - write the output division to File*/
     writeGroupsToFile(O,locationOutput);
 
+    /*delete*/
+    vertexes=(double)B->n;
+    /*delete*/
+
     /*free B*/
-    /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
+    B->freeModMath(B);
+    free(B);
 
     /*free division*/
     free(g1);
@@ -141,10 +153,15 @@ int cluster(int argc, char* argv[]){ /* change to main and delete cluster.h!!!!!
     free(P);
     free(O);
 
+    /*end timing*/
+    t = clock() - t;
+    time_taken = (((double)t)/CLOCKS_PER_SEC); // in seconds
+    printf("\nRun for &f vertexes took %f seconds to execute \n",vertexes, time_taken);
+
     return 0;
 
 }
-
+/*
 int main(){
     clock_t t;
     t = clock();
@@ -153,4 +170,4 @@ int main(){
     double time_taken = (((double)t)/CLOCKS_PER_SEC); // in seconds
     printf("\ntime9() took %f seconds to execute \n", time_taken);
     return 0;
-}
+}*/

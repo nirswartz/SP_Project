@@ -4,7 +4,7 @@
 #include <math.h>
 #include "errors.h"
 #include "spmat.h"
-#include "help.h"
+/*#include "help.h"*/
 #include "modMat.h"
 
 double epsilon = 0.00001;

@@ -3,7 +3,7 @@
 #include "errors.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "help.h"
+/*#include "help.h"*/
 #include "eigen.h"
 #include "math.h"
 
@@ -293,6 +293,15 @@ void multB_hat(const struct _modMat *B, const double *v, double *result, int *g,
     free(tmp);
 }
 
+void freeModMath(modMat *mat){
+    mat->A->free(mat->A);
+    free(mat->A);
+    free(mat->k);
+    if(mat->last_f != NULL){
+        free(mat->last_f);
+    }
+}
+
 
 modMat* modMat_allocate(char *location){
     FILE *fInput;
@@ -334,6 +343,9 @@ modMat* modMat_allocate(char *location){
 
     /*define mult function for B^*/
     mat->multB_hat=&multB_hat;
+
+    /*define free function*/
+    mat->freeModMath=&freeModMath;
 
     fclose(fInput);
     return mat;

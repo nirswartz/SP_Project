@@ -395,6 +395,6 @@ void test10(){
         arr[0]="sonia and nir are the best!";
         arr[1]=locationInput;
         arr[2]=locationOutput;
-        cluster(10,arr);
+        /*cluster(10,arr);*/
         printFinalGroups(locationOutput);
 };

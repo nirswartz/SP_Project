@@ -4,6 +4,7 @@
 #include "modMat.h"
 #include "errors.h"
 #include "maximization.h"
+#include "divide.h"
 
 #define IS_POSITIVE(X)((X)>0.00001)
 
