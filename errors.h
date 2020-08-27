@@ -11,7 +11,7 @@ void checkItemsRead(int read, int shouldRead, int rowNum, char *programName);
 void checkItemsWrite(int write, int shouldWrite, int rowNum, char *programName);
 
 /* checks if dividing by zero - Exit code 40*/
-void checkDivideByZero(int num, int rowNum, char *programName);
+void checkDivideByZero(double num, int rowNum, char *programName);
 
 /* checks if the last fopen was successful  - Exit code 50*/
 void checkOpenFile(void *open, char *fileName, int rowNum, char *programName);

@@ -330,8 +330,14 @@ void test8(){
 
 /* test the graft as given by Moshe*/
 void test9(){
+    double *eigen;
+    int g[20]={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
     char *location="C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\graph20.in";
     modMat *B=modMat_allocate(location);
     B->A->printSparse(B->A);
     printB(B);
+    eigen=calloc(B->n, sizeof(double));
+    B->updateB_Hat(B,g,20);
+    powerIteration(B,eigen,g,20);
+    printVectorDouble(eigen,20);
 }

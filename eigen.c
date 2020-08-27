@@ -36,7 +36,6 @@ void normalized(double *arr, int rowLength) {
     int i;
     double norm = sqrt(dotProduct(arr,arr,rowLength));
     checkDivideByZero(norm, __LINE__,__FILE__);
-
     for (i = 0; i < rowLength; i++) {
         *arr = (double) *arr / norm;
         arr++;
@@ -66,7 +65,7 @@ int bigDifference(double *b, double* bNew, int rowLength){
 void powerIteration(modMat *B, double *vector, int *g, int gLen)
 {
     int		flag = 1, i;
-    double  *b, *bNew, *tmp, norm;
+    double  *b, *bNew, *tmp;
 
     /*initialize arr for eigenvector*/
     b = calloc(gLen,sizeof(double));

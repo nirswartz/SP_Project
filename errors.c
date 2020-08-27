@@ -23,8 +23,8 @@ void checkItemsWrite(int write, int shouldWrite, int rowNum, char *programName){
     }
 }
 
-void checkDivideByZero(int num, int rowNum, char *programName){
-    if(num==0){
+void checkDivideByZero(double num, int rowNum, char *programName){
+    if(num==0.0){
         printf("Divide by zero in line: %d in program: %s\n",rowNum, programName);
         exit(40);
     }

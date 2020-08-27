@@ -43,9 +43,6 @@ void initializationOfGroups(linkedList *O, linkedList *P, int n){
     for(i=0;i<n;i++){
         trivial[i] = i;
     }
-
-    P = linkedList_allocate();
-    O = linkedList_allocate();
     P->insert_first(P,trivial,n); /* P = {{0,...,n-1}}, O = {} */
 }
 
@@ -71,6 +68,8 @@ int tmp(int argc, char* argv[]){ /* change to main!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     B = modMat_allocate(locationInput);
 
     /* Stage 1+2 - initialization Of P and O*/
+    P = linkedList_allocate();
+    O = linkedList_allocate();
     initializationOfGroups(O, P, B->n);
 
     /* Stage 3 - calculating the modularity groups*/

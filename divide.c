@@ -119,7 +119,7 @@ void calcTwoDivision(modMat *B, int **division, int *g, int gLen){
         gIsIndivisible(division, g, gLen);
     }
     /* stage 3 - compute s */
-    s = calloc(gLen, sizeof(int));
+    s = calloc(gLen, sizeof(double));
     createS(eigenvector, s, gLen);
 
     /*Maximize modularity of division of vector s*/

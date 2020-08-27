@@ -8,15 +8,20 @@
 
 /* calculate k vector and M (nnz) */
 void countNnz(modMat *B, FILE *fInput){
-    int M = 0, i, k_i, check, *kVector = B->k;
+    int M = 0, i, k_i, check, *kVector = B->k,j;
     for(i = 0; i < B->n ; ++i){
         /*read k_i from file*/
         check = fread(&k_i, sizeof(int), 1, fInput);
+        printf("k_%d=%d\n",i,k_i);
         checkItemsRead(check, 1, __LINE__,__FILE__);
         *kVector = k_i;
         kVector++;
         M += k_i;
-        fseek(fInput, k_i*sizeof(int), SEEK_CUR);
+        for(j=0;j<k_i;j++){ /*$$$$$$$delete$$$$$$$$$$$$$$$*/
+            fread(&check, sizeof(int), 1, fInput);
+        }
+        /*&&&&&&&& on nova should be this line!! &&&&&&&&&&&&*/
+        /*fseek(fInput,(k_i*sizeof(int)), SEEK_CUR);*/
     }
     /* return to k_1 in the file  */
     fseek(fInput, sizeof(int) , SEEK_SET);
@@ -258,15 +263,16 @@ void updateB_Hat(struct _modMat *B, int *g, int gLen){
 
 /* B_hat[g]*v = A[g]*v - (k^T*v*k)/M - f*I*v + ||B_hat[g]||*I*v */
 void multB_hat(const struct _modMat *B, const double *v, double *result, int *g, int gLen){
-    double *tmp, scalar, *f, norm;
+    double *tmp, scalar, *f;
     tmp = calloc(gLen,sizeof(double));
     checkAllocation(tmp, __LINE__,__FILE__);
     f=B->last_f;
 
     /* calculating A*v */
-    B->A->mult(B->A,v,tmp,g,gLen);
-    /*add tmp to result*/
-    vectorAddition(result, tmp, gLen);
+    B->A->mult(B->A,v,result,g,gLen);
+    /*printf("aaaaaaaa\n");
+    printVectorDouble(result,gLen);
+    printf("dddddddd\n");*/
 
     /* calculating ((k^T*v)/M)* k */
     scalar = (dotProductByG(B->k, v, g,gLen)) / B->M;

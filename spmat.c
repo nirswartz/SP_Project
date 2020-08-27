@@ -47,10 +47,11 @@ void freeMat(struct _spmat *A){
 }
 
 void mult(const struct _spmat *A, const double *v, double *result, int *g, int gLen){
-    int i,j,sum, *gI = g, *gJ = g;
+    int i,j, *gI = g, *gJ = g;
     const double *p;
+    double sum;
     for(i=0;i<gLen;i++) {
-        sum=0;
+        sum=0.0;
         p = v;
         for (j = 0; j < gLen; j++) {
             sum+=((A->getA(A,*gI,*gJ))* *p);

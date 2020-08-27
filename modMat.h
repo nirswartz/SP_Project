@@ -3,6 +3,7 @@
 #ifndef MODMAT_H_
 #define MODMAT_H_
 
+
 typedef struct _modMat {
     /* Matrix size (n*n) */
     int	n;
