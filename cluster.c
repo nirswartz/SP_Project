@@ -6,6 +6,7 @@
 #include "linkedList.h"
 #include "divide.h"
 #include "modMat.h"
+#include "cluster.h" /*$$$$$$$$$$$ to delete 444444444444*/
 
 void writeGroupsToFile(linkedList *O, char *locationOutput){
     FILE *fOutput;
@@ -46,7 +47,7 @@ void initializationOfGroups(linkedList *O, linkedList *P, int n){
     P->insert_first(P,trivial,n); /* P = {{0,...,n-1}}, O = {} */
 }
 
-int tmp(int argc, char* argv[]){ /* change to main!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+int cluster(int argc, char* argv[]){ /* change to main and delete cluster.h!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
     char *locationInput, *locationOutput;
     FILE *fInput;
     int numOfNodes,check, *g,*g1,*g2, gLen, size_g1, size_g2, **division;
@@ -77,6 +78,22 @@ int tmp(int argc, char* argv[]){ /* change to main!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         /* Stage 3.1 - Remove a group g from P */
         g = P->head->data;
         gLen = P->head->size;
+
+        /*printf("g is ");
+        printVectorInt(g,gLen);
+        if(P->len==0){
+            printf("P is empty\n");
+        } else{
+            printf("P is:\n");
+            P->printList(P);
+        }
+        if(O->len==0){
+            printf("O is empty\n");
+        } else {
+            printf("O is:\n");
+            O->printList(P);
+        }*/
+
         P->delete_first(P,0); /* 0 means deleting the node without freeing its data */
 
         /* Stage 3.2 - Divide g into g1,g2 with Algorithm 2*/
@@ -90,17 +107,18 @@ int tmp(int argc, char* argv[]){ /* change to main!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         if(size_g1 == 0 || size_g2 == 0){
             O->insert_last(O,g,gLen);
         }
-
-        /* Stage 3.4 - add groups to P or O*/
-        if(size_g1 == 1){
-            O->insert_last(O,g1,size_g1);
-        } else{
-            P->insert_last(P,g1,size_g1);
-        }
-        if(size_g2==1){
-            O->insert_last(O,g2,size_g2);
-        } else{
-            P->insert_last(P,g2,size_g2);
+        else {
+            /* Stage 3.4 - add groups to P or O*/
+            if(size_g1 == 1){
+                O->insert_last(O,g1,size_g1);
+            } else{
+                P->insert_last(P,g1,size_g1);
+            }
+            if(size_g2==1){
+                O->insert_last(O,g2,size_g2);
+            } else{
+                P->insert_last(P,g2,size_g2);
+            }
         }
     }
 
@@ -130,7 +148,7 @@ int tmp(int argc, char* argv[]){ /* change to main!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 int main(){
     clock_t t;
     t = clock();
-    test9();
+    test10();
     t = clock() - t;
     double time_taken = (((double)t)/CLOCKS_PER_SEC); // in seconds
     printf("\ntime9() took %f seconds to execute \n", time_taken);

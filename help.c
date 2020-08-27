@@ -8,6 +8,8 @@
 #include "help.h"
 #include "modMat.h"
 #include "linkedList.h"
+#include "divide.h"
+#include "cluster.h"
 
 /*
 #define NIR_INPUT\ C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\
@@ -191,6 +193,33 @@ void printAllIntValuesFromFIle(char *location){
         i++;
     }
     printf("\n");
+    fclose(fInput);
+}
+
+void printFinalGroups(char *location){
+    int value,i,j, numOfGroups, numInGroup_i;
+    FILE *fInput;
+   /* printf("g is { ");
+    for (i = 0;  i<gLen-1 ; i++) {
+        printf("%d, ", g[i]);
+    }
+    printf("%d }\n", g[i]);*/
+    fInput = fopen(location, "r");
+    checkOpenFile(fInput, location ,__LINE__,__FILE__ );
+    fread(&numOfGroups, sizeof(int), 1, fInput);
+    printf("There is %d groups in division\n",numOfGroups);
+    for (i = 0;  i< numOfGroups; i++) {
+        fread(&numInGroup_i, sizeof(int), 1, fInput);
+        printf("Group %d: { ",i);
+        for (j = 0; j < numInGroup_i-1 ; ++j) {
+            fread(&value, sizeof(int), 1, fInput);
+            printf("%d , ",value);
+        }
+        fread(&value, sizeof(int), 1, fInput);
+        printf("%d }\n",value);
+    }
+    printf("\n");
+    fclose(fInput);
 }
 
 /*tester of power iteration*/
@@ -328,16 +357,44 @@ void test8(){
     printAllIntValuesFromFIle(location);
 }
 
-/* test the graft as given by Moshe*/
+/* test partly the graft as given by Moshe*/
 void test9(){
     double *eigen;
-    int g[20]={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
+    int g[20]={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19}, **division, g1[13]={7,8,9,10,11,12,13,14,15,16,17,18,19};
     char *location="C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\graph20.in";
     modMat *B=modMat_allocate(location);
-    B->A->printSparse(B->A);
-    printB(B);
+    /*B->A->printSparse(B->A);
+    printB(B);*/
     eigen=calloc(B->n, sizeof(double));
-    B->updateB_Hat(B,g,20);
-    powerIteration(B,eigen,g,20);
-    printVectorDouble(eigen,20);
+    division = calloc(4, sizeof(int*));
+    checkAllocation(division,__LINE__,__FILE__);
+    division[2] = calloc(1, sizeof(int));
+    checkAllocation(division[2],__LINE__,__FILE__);
+    division[3]=calloc(1, sizeof(int));
+    checkAllocation(division[3],__LINE__,__FILE__);
+    /*calcTwoDivision(B,division,g,20);
+    printf("g:\n");
+    printVectorInt(g,20);
+    printf("g1:\n");
+    printVectorInt(division[0],*division[2]);
+    printf("g2:\n");
+    printVectorInt(division[1],*division[3]);*/
+    calcTwoDivision(B,division,g1,13);
+    printf("g1 divided:\n");
+    printf("g1:\n");
+    printVectorInt(division[0],*division[2]);
+    printf("g2:\n");
+    printVectorInt(division[1],*division[3]);
 }
+
+/* test all the graft as given by Moshe*/
+void test10(){
+        char *locationInput="C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\inputs\\graph20.in";
+        char *locationOutput="C:\\Users\\Nir Swartz\\CLionProjects\\SP-Project\\outputs\\groups20.in";
+        char *arr[3];
+        arr[0]="sonia and nir are the best!";
+        arr[1]=locationInput;
+        arr[2]=locationOutput;
+        cluster(10,arr);
+        printFinalGroups(locationOutput);
+};

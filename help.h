@@ -27,6 +27,8 @@ void printVectorDouble(double *vector, int vectorSize);
 
 void printAllIntValuesFromFIle(char *location);
 
+void printFinalGroups(char *location);
+
 /*tester of power iteration*/
 void test1();
 
@@ -49,7 +51,10 @@ void test7();
 /* make same graph as given by Moshe */
 void test8();
 
-/* test the graft as given by Moshe*/
+/* test partly the graft as given by Moshe*/
 void test9();
+
+/* test all the graft as given by Moshe*/
+void test10();
 
 #endif

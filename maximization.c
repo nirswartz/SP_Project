@@ -19,7 +19,7 @@ void copyVector(int *original, int *copy, int len){
 
 /*Maximize the division from Algorithm 2 like in Algorithm 4*/
 void maxDivision(modMat *B, double *s, int *g, int gLen){
-    double deltaQ, *score, *improve, Q_0, maxValue = 0;
+    double deltaQ, *score, *improve, Q_0, maxValue = 0, *sStart = s, *scoreStart = score, *improveStart = improve;
     int *indices, *unmoved, i, k, maxIndexInScore = 0, maxIndexInImprove = 0, *unmovedStart;
 
     score = calloc(gLen, sizeof(double));
@@ -39,41 +39,49 @@ void maxDivision(modMat *B, double *s, int *g, int gLen){
         /*trying to find an improvement of the partition defined by s*/
         for (i = 0; i < gLen; ++i) {
             /* lines 4 - 10: Computing deltaQ for the move of each unmoved vertex*/
-            Q_0 = computeDeltaQ(B, s, g, gLen);
+            Q_0 = computeDeltaQ(B, sStart, g, gLen);
             for (k = 0; k < gLen; ++k) {
                 if(*unmoved != -1){
-                    s[k] = -s[k];
-                    score[k] = computeDeltaQ(B, s, g, gLen) - Q_0;
+                    *s = -(*s);
+                    *score = computeDeltaQ(B, sStart, g, gLen) - Q_0;
                     /* compute max{score[j] : j in Unmoved} */
-                    if(score[k] > maxValue){
-                        maxValue = score[k];
+                    if(*score > maxValue){
+                        maxValue = *score;
                         maxIndexInScore = k;
                     }
-                    s[k] = -s[k];
+                    *s = -(*s);
                 }
+                s++;
                 unmoved++;
+                score++;
             }
             unmoved = unmovedStart;
+            s = sStart;
+            score = scoreStart;
 
             /* lines 11 - 20: Moving vertex j' with a maximal score*/
             s[maxIndexInScore] = -(s[maxIndexInScore]);
-            indices[i] = maxIndexInScore;
+            *indices = maxIndexInScore;
+            indices++;
             if(i == 0){
-                improve[i] = score[maxIndexInScore];
-                maxValue = improve[i];
+                *improve = score[maxIndexInScore];
+                maxValue = *improve;
             } else{
-                improve[i] = improve[i-1] + score[maxIndexInScore];
-                if(improve[i] > maxValue){
+                *improve = *(improve-1) + score[maxIndexInScore];
+                if(*improve > maxValue){
                     maxIndexInImprove = i;
-                    maxValue = improve[i];
+                    maxValue = *improve;
                 }
             }
             unmoved[maxIndexInScore] = -1;
+            improve++;
         }
+        improve = improveStart;
 
         /* lines 21 - 30: find the maximum improvement of s and update s accordingly*/
         for (k = gLen-1; k > maxIndexInImprove ; k--) {
-            s[indices[k]] = -s[indices[k]];
+            indices--;
+            s[*indices] = -s[*indices];
         }
 
         if(maxIndexInImprove == gLen-1){

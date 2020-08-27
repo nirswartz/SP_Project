@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "help.h"
 #include "eigen.h"
+#include "math.h"
 
 /* calculate k vector and M (nnz) */
 void countNnz(modMat *B, FILE *fInput){
@@ -12,7 +13,7 @@ void countNnz(modMat *B, FILE *fInput){
     for(i = 0; i < B->n ; ++i){
         /*read k_i from file*/
         check = fread(&k_i, sizeof(int), 1, fInput);
-        printf("k_%d=%d\n",i,k_i);
+       /* printf("k_%d=%d\n",i,k_i);*/
         checkItemsRead(check, 1, __LINE__,__FILE__);
         *kVector = k_i;
         kVector++;
@@ -230,7 +231,7 @@ double normCalc(const struct _modMat *B, int *g, int gLen, double *f){
         p = arr;
         gIn = g;
         for (j = 0; j < gLen ; ++j) {
-            *p += B->getHatB(B,*gOut,*gIn,g,gLen,f);
+            *p += fabs(B->getHatB(B,*gOut,*gIn,g,gLen,f));
             gIn++;
             p++;
         }
