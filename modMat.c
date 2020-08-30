@@ -276,7 +276,7 @@ void updateB_Hat(struct _modMat *B, int *g, int gLen){
     B->last_f = calloc(gLen,sizeof(double));
     checkAllocation(B->last_f, __LINE__, __FILE__);
     fCalc(B, B->last_f, g, gLen);
-    B->last_norm = normCalc(B,g,gLen,B->last_f);
+   /* B->last_norm = normCalc(B,g,gLen,B->last_f);*/
 }
 
 /* B_hat[g]*v = A[g]*v - (k^T*v*k)/M - f*I*v + ||B_hat[g]||*I*v */
@@ -304,7 +304,7 @@ void multB_hat(const struct _modMat *B, const double *v, double *result, int *g,
     vectorSubtraction(result, tmp, gLen);
 
     /* calculating ||B_hat||*v */
-    vectorScalarMult(v,B->last_norm, tmp, gLen);
+    vectorScalarMult(v,B->norm, tmp, gLen);
     /*add tmp to result*/
     vectorAddition(result, tmp, gLen);
     free(tmp);
