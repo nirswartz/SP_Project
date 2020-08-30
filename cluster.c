@@ -111,6 +111,7 @@ int main(int argc, char* argv[]){
         /* Stage 3.3 - check if g1 or g2 is of size 0*/
         if(size_g1 == 0 || size_g2 == 0){
             O->insert_last(O,g,gLen);
+            free(g2); /*free garbage cell*/
         }
         else {
             /* Stage 3.4 - add groups to P or O*/
@@ -140,8 +141,8 @@ int main(int argc, char* argv[]){
     free(B);
 
     /*free division*/
-    free(g1);
-    free(g2);
+    /*free(g1);
+    free(g2);*/
     free(division[2]);
     free(division[3]);
     free(division);

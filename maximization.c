@@ -41,11 +41,11 @@ void maxDivision(modMat *B, double *s, int *g, int gLen){
         /*trying to find an improvement of the partition defined by s*/
         for (i = 0; i < gLen; ++i) {
             /* lines 4 - 10: Computing deltaQ for the move of each unmoved vertex*/
-            Q_0 = computeDeltaQ(B, sStart, g, gLen);
+            Q_0 = computeModularity(B, sStart, g, gLen);
             for (k = 0; k < gLen; ++k) {
                 if(*unmoved != -1){
                     *s = -(*s);
-                    *score = computeDeltaQ(B, sStart, g, gLen) - Q_0;
+                    *score = computeModularity(B, sStart, g, gLen) - Q_0;
                     /* compute max{score[j] : j in Unmoved} */
                     if(*score > maxValue){
                         maxValue = *score;

@@ -6,6 +6,7 @@
 #include "maximization.h"
 #include "divide.h"
 
+
 #define IS_POSITIVE(X)((X)>0.00001)
 
 void createS(double *eigenvector, double *s, int vectorSize){
@@ -28,7 +29,7 @@ double computeEigenvalue(modMat *B ,double *eigenvector, int *g, int gLen){
     v = calloc(gLen, sizeof(double));
     checkAllocation(v, __LINE__,__FILE__);
     /* compute B_hat[g]*eigenvector */
-    B->multB_hat_noShift(B, eigenvector,v, g, gLen); /*$$$$$$$$$$$$$$$$$$$$$$$ changed mult*/
+    B->multB_hat(B, eigenvector,v, g, gLen); /*$$$$$$$$$$$$$$$$$$$$$$$ changed mult*/
     /* compute (eigenvector^T * B_hat[g]*eigenvector) */
     dot1 = dotProduct(eigenvector,v,gLen);
     /* compute (eigenvector^T * eigenvector) */
@@ -37,18 +38,20 @@ double computeEigenvalue(modMat *B ,double *eigenvector, int *g, int gLen){
 
     return (dot1 / dot2);
 }
-/*compute modularity Q = s^T*B^[g]*s */
-double computeDeltaQ(modMat *B, double *s, int *g, int gLen){
-    double *v = calloc(gLen, sizeof(double));
-    checkAllocation(v, __LINE__,__FILE__);
-    /*compute B^[g]*s */
-    B->multB_hat_noShift(B, s, v, g, gLen); /*$$$$$$$$$$$$$$$$$$$$$$$ changed mult*/
-    /*compute s^T * B^[g]*s */
-    return dotProduct(s, v, gLen);
-}
+/*compute modularity Q = s^T*B^[g]*s
+double computeModularity(modMat *B, double *s, int *g, int gLen) {
+    double *v = calloc(gLen, sizeof(double)), result;
+    checkAllocation(v, __LINE__, __FILE__);
+    compute B^[g]*s
+    B->multB_hat_noShift(B, s, v, g, gLen); $$$$$$$$$$$$$$$$$$$$$$$ changed mult
+    compute s^T * B^[g]*s
+    result = dotProduct(s, v, gLen);
+    free(v);
+    return result;
+}*/
 
-/*compute modularity Q = s^T*B^[g]*s */
-double computeDeltaQ2(modMat *B, double *s, int *g, int gLen){
+/*compute modularity Q = s^T*B^[g]*s according to linear algebra*/
+double computeModularity(modMat *B, double *s, int *g, int gLen){
     int i,j,k;
     double sum, innerSum, sub;
     for(i=0; i<gLen; i++){
@@ -64,7 +67,7 @@ double computeDeltaQ2(modMat *B, double *s, int *g, int gLen){
             sum+=(sub*s[i]*s[j]);
         }
     }
-    return sum*0.5;
+    return sum;
 }
 
 /*Divide the vertices in g into two groups g1,g2 according to s where division[0]=g1 and division[1]=g2
@@ -95,6 +98,7 @@ void makeDivision(int **division, double *s, int *g, int gLen, int numOfPositive
     division[1] = p2;
     *division[2] = numOfPositive;
     *division[3] = (gLen-numOfPositive);
+    /*free(g);*/
 }
 
 /* couldn't find a good division of g, return g (in division[0])
@@ -137,7 +141,10 @@ void calcTwoDivision(modMat *B, int **division, int *g, int gLen){
     /* stage 2 */
     if(lambda <= 0){
         gIsIndivisible(division, g, gLen);
+        free(eigenvector);
+        return;
     }
+
     /* stage 3 - compute s */
     s = calloc(gLen, sizeof(double));
     createS(eigenvector, s, gLen);
@@ -146,12 +153,18 @@ void calcTwoDivision(modMat *B, int **division, int *g, int gLen){
     maxDivision(B, s, g, gLen);
 
     /* stage 4 - compute s^T*B_hat[g]*s */
-    Q = computeDeltaQ(B, s, g, gLen);
+
+    Q = computeModularity(B, s, g, gLen);
     if (Q <= 0){
         gIsIndivisible(division, g, gLen);
+        free(eigenvector);
+        free(s);
+        return;
     }
 
     /* stage 5 - divide s into g_1 and g_2 */
     makeDivision(division,s,g,gLen,countPositiveValues(s,gLen));
 
+    free(eigenvector);
+    free(s);
 }
