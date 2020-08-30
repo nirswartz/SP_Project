@@ -16,6 +16,7 @@ typedef struct _modMat {
     /*f vector and norm according to the last B^[g]*/
     double *last_f;
     double last_norm;
+    double norm;
     /* getter for B(i,j)  */
     double (*getB)(const struct _modMat *B, int i, int j);
     /* getter for B^(i,j) */

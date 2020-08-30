@@ -250,6 +250,23 @@ double normCalc(const struct _modMat *B, int *g, int gLen, double *f){
     return max;
 }
 
+/* calculating 1-norm of B_hat using getter of B*/
+void calculateNorm(modMat *B){
+    int i, j;
+    double max = B->getB(B,0,0), sum = 0;
+
+    for (i = 0; i < B->n ; ++i) {
+    	sum = 0;
+    	for (j = 0; j < B->n ; ++j) {
+            sum += fabs(B->getB(B,i,j));
+        }
+    	if(sum > max){
+    		max = sum;
+    	}
+    }
+    B->norm = max;
+}
+
 /*Calc f vector and norm according to g*/
 void updateB_Hat(struct _modMat *B, int *g, int gLen){
     /* create f according to g */
@@ -364,6 +381,9 @@ modMat* modMat_allocate(char *location){
 
     /* define a getter for B^ */
     mat->getHatB= &getHatB;
+
+    /*initialize norm of B */
+    calculateNorm(mat);
 
     /*define function for updating f vector and norm according to g*/
     mat->updateB_Hat=&updateB_Hat;
