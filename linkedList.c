@@ -41,8 +41,9 @@ void insert_last(struct _linkedList *list, int* data, int size){
 
 /*Delete the first node from the list. If contentFlag==1, so the data will be deleted as well*/
 void delete_first(struct _linkedList *list, int contentFlag){
+	node *tmp;
     checkEmptyList(list->len,__LINE__,__FILE__);
-    node *tmp=list->head;
+    tmp=list->head;
     if(list->len==1){
         list->head=NULL;
         list->tail=NULL;
@@ -59,8 +60,9 @@ void delete_first(struct _linkedList *list, int contentFlag){
 /*Delete the last node from the list. If contentFlag==1, so the data will be deleted as well*/
 /*O(n)!*/
 void delete_last(struct _linkedList *list, int contentFlag){
+	node *tmp;
     checkEmptyList(list->len,__LINE__,__FILE__);
-    node *tmp=list->head;
+    tmp=list->head;
     if(list->len==1){
         list->head=NULL;
         list->tail=NULL;
@@ -86,9 +88,11 @@ void deleteNode(linkedList *list, node nodeDelete){
 
 /*Print the list*/
 void printList(struct _linkedList *list){
+	int len,i,j,*val;
+	node *tmp;
     checkEmptyList(list->len,__LINE__,__FILE__);
-    int len=list->len,i,j,*val;
-    node *tmp=list->head;
+    len=list->len;
+    tmp=list->head;
     printf("The list has %d nodes: ",len);
     for(i=0;i<len-1;i++){
         printf("{");

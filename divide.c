@@ -103,7 +103,6 @@ int countPositiveValues(double *vector,int vectorSize){
  * division[2]=size(g1) and division[3]=size(g2)*/
 void calcTwoDivision(modMat *B, int **division, int *g, int gLen){
     double *eigenvector, *s, lambda, Q;
-    int numOfPositive;
 
     eigenvector = calloc(gLen, sizeof(double));
     checkAllocation(eigenvector, __LINE__,__FILE__);

@@ -35,7 +35,7 @@ void writeGroupsToFile(linkedList *O, char *locationOutput){
     fclose(fOutput);
 }
 
-void initializationOfGroups(linkedList *O, linkedList *P, int n){
+void initializationOfGroups(linkedList *P, int n){
     int *trivial,i;
 
     /*Creating the trivial division of {1,2,...,n}*/
@@ -47,14 +47,12 @@ void initializationOfGroups(linkedList *O, linkedList *P, int n){
     P->insert_first(P,trivial,n); /* P = {{0,...,n-1}}, O = {} */
 }
 
-/*int cluster(int argc, char* argv[]){ /* change to main and delete cluster.h!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+/*int cluster(int argc, char* argv[]){ change to main and delete cluster.h!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 int main(int argc, char* argv[]){
     char *locationInput, *locationOutput;
-    FILE *fInput;
-    int numOfNodes,check, *g,*g1,*g2, gLen, size_g1, size_g2, **division;
+    int *g,*g1,*g2, gLen, size_g1, size_g2, **division;
     linkedList *O, *P;
     modMat *B;
-
 
     /*timing*/
     clock_t t;
@@ -78,7 +76,7 @@ int main(int argc, char* argv[]){
     /* Stage 1+2 - initialization Of P and O*/
     P = linkedList_allocate();
     O = linkedList_allocate();
-    initializationOfGroups(O, P, B->n);
+    initializationOfGroups(P, B->n);
 
     /* Stage 3 - calculating the modularity groups*/
     while((P->len) > 0){
@@ -136,6 +134,8 @@ int main(int argc, char* argv[]){
     vertexes=(double)B->n;
     /*delete*/
 
+    printf("%d",argc); /*delete!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
     /*free B*/
     B->freeModMath(B);
     free(B);
@@ -155,8 +155,8 @@ int main(int argc, char* argv[]){
 
     /*end timing*/
     t = clock() - t;
-    time_taken = (((double)t)/CLOCKS_PER_SEC); // in seconds
-    printf("\nRun for &f vertexes took %f seconds to execute \n",vertexes, time_taken);
+    time_taken = (((double)t)/CLOCKS_PER_SEC); /* in seconds*/
+    printf("\nRun for %f vertexes took %f seconds to execute \n",vertexes, time_taken);
 
     return 0;
 

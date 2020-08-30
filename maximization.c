@@ -19,13 +19,15 @@ void copyVector(int *original, int *copy, int len){
 
 /*Maximize the division from Algorithm 2 like in Algorithm 4*/
 void maxDivision(modMat *B, double *s, int *g, int gLen){
-    double deltaQ, *score, *improve, Q_0, maxValue = 0, *sStart = s, *scoreStart = score, *improveStart = improve;
+    double deltaQ, *score, *improve, Q_0, maxValue = 0, *sStart = s, *scoreStart, *improveStart;
     int *indices, *unmoved, i, k, maxIndexInScore = 0, maxIndexInImprove = 0, *unmovedStart;
 
     score = calloc(gLen, sizeof(double));
     checkAllocation(score, __LINE__,__FILE__);
+    scoreStart = score;
     improve = calloc(gLen, sizeof(double));
     checkAllocation(improve, __LINE__,__FILE__);
+    improveStart = improve;
     indices = calloc(gLen, sizeof(int));
     checkAllocation(indices, __LINE__,__FILE__);
 
