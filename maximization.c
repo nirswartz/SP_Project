@@ -19,15 +19,9 @@ void copyVector(int *original, int *copy, int len){
 
 /*Maximize the division from Algorithm 2 like in Algorithm 4*/
 void maxDivision(modMat *B, double *s, int *g, int gLen){
-    double deltaQ, *score, *improve, Q_0, maxValue = 0, *sStart = s, *scoreStart, *improveStart;
+    double deltaQ, score, improve, max_score=0, max_improve, Q_0, *sStart = s;
     int *indices, *unmoved, i, k, maxIndexInScore = 0, maxIndexInImprove = 0, *unmovedStart;
 
-    score = calloc(gLen, sizeof(double));
-    checkAllocation(score, __LINE__,__FILE__);
-    scoreStart = score;
-    improve = calloc(gLen, sizeof(double));
-    checkAllocation(improve, __LINE__,__FILE__);
-    improveStart = improve;
     indices = calloc(gLen, sizeof(int));
     checkAllocation(indices, __LINE__,__FILE__);
 
@@ -37,7 +31,7 @@ void maxDivision(modMat *B, double *s, int *g, int gLen){
     copyVector(g,unmoved,gLen);
     unmovedStart = unmoved; /* pointer to the start of unmoved */
 
-    while(IS_POSITIVE(deltaQ)){
+    do{
         /*trying to find an improvement of the partition defined by s*/
         for (i = 0; i < gLen; ++i) {
             /* lines 4 - 10: Computing deltaQ for the move of each unmoved vertex*/
@@ -45,40 +39,36 @@ void maxDivision(modMat *B, double *s, int *g, int gLen){
             for (k = 0; k < gLen; ++k) {
                 if(*unmoved != -1){
                     *s = -(*s);
-                    *score = computeModularity(B, sStart, g, gLen) - Q_0;
+                    score = computeModularity(B, sStart, g, gLen) - Q_0;
                     /* compute max{score[j] : j in Unmoved} */
-                    if(*score > maxValue){
-                        maxValue = *score;
+                    if(score > max_score){
+                        max_score = score;
                         maxIndexInScore = k;
                     }
                     *s = -(*s);
                 }
                 s++;
                 unmoved++;
-                score++;
             }
             unmoved = unmovedStart;
             s = sStart;
-            score = scoreStart;
 
             /* lines 11 - 20: Moving vertex j' with a maximal score*/
             s[maxIndexInScore] = -(s[maxIndexInScore]);
             *indices = maxIndexInScore;
             indices++;
             if(i == 0){
-                *improve = score[maxIndexInScore];
-                maxValue = *improve;
+                improve = max_score;
+                max_improve = max_score;
             } else{
-                *improve = *(improve-1) + score[maxIndexInScore];
-                if(*improve > maxValue){
+                improve += max_score;
+                if(improve > max_improve){
                     maxIndexInImprove = i;
-                    maxValue = *improve;
+                    max_improve = improve;
                 }
             }
             unmoved[maxIndexInScore] = -1;
-            improve++;
         }
-        improve = improveStart;
 
         /* lines 21 - 30: find the maximum improvement of s and update s accordingly*/
         for (k = gLen-1; k > maxIndexInImprove ; k--) {
@@ -88,8 +78,8 @@ void maxDivision(modMat *B, double *s, int *g, int gLen){
 
         if(maxIndexInImprove == gLen-1){
             deltaQ = 0;
-        } else{
-            deltaQ = improve[maxIndexInImprove];
+        } else {
+            deltaQ = max_improve;
         }
-    }
+    }while(IS_POSITIVE(deltaQ));
 }
