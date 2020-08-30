@@ -132,9 +132,8 @@ int main(int argc, char* argv[]){
 
     /*delete*/
     vertexes=(double)B->n;
+    argc=argc;
     /*delete*/
-
-    printf("%d",argc); /*delete!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
     /*free B*/
     B->freeModMath(B);

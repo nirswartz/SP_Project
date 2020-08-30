@@ -293,6 +293,33 @@ void multB_hat(const struct _modMat *B, const double *v, double *result, int *g,
     free(tmp);
 }
 
+/* B_hat[g]*v = A[g]*v - (k^T*v*k)/M - f*I*v + ||B_hat[g]||*I*v */
+void multB_hat_noShift(const struct _modMat *B, const double *v, double *result, int *g, int gLen){
+    double *tmp, scalar, *f;
+    tmp = calloc(gLen,sizeof(double));
+    checkAllocation(tmp, __LINE__,__FILE__);
+    f=B->last_f;
+
+    /* calculating A*v */
+    B->A->mult(B->A,v,result,g,gLen);
+    /*printf("aaaaaaaa\n");
+    printVectorDouble(result,gLen);
+    printf("dddddddd\n");*/
+
+    /* calculating ((k^T*v)/M)* k */
+    scalar = (dotProductByG(B->k, v, g,gLen)) / B->M;
+    vectorScalarMultByG(B->k, scalar, tmp,g, gLen);
+    /*add tmp to result*/
+    vectorSubtraction(result, tmp, gLen);
+
+    /* calculating f*I*v */
+    vectorMult(f, v, tmp, gLen);
+    /*add tmp to result*/
+    vectorSubtraction(result, tmp, gLen);
+
+    free(tmp);
+}
+
 void freeModMath(modMat *mat){
     mat->A->free(mat->A);
     free(mat->A);
@@ -346,6 +373,9 @@ modMat* modMat_allocate(char *location){
 
     /*define free function*/
     mat->freeModMath=&freeModMath;
+
+    /*????????deleteeee ??????*/
+    mat->multB_hat_noShift=&multB_hat_noShift;
 
     fclose(fInput);
     return mat;

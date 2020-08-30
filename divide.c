@@ -28,7 +28,7 @@ double computeEigenvalue(modMat *B ,double *eigenvector, int *g, int gLen){
     v = calloc(gLen, sizeof(double));
     checkAllocation(v, __LINE__,__FILE__);
     /* compute B_hat[g]*eigenvector */
-    B->multB_hat(B, eigenvector,v, g, gLen);
+    B->multB_hat_noShift(B, eigenvector,v, g, gLen); /*$$$$$$$$$$$$$$$$$$$$$$$ changed mult*/
     /* compute (eigenvector^T * B_hat[g]*eigenvector) */
     dot1 = dotProduct(eigenvector,v,gLen);
     /* compute (eigenvector^T * eigenvector) */
@@ -42,9 +42,29 @@ double computeDeltaQ(modMat *B, double *s, int *g, int gLen){
     double *v = calloc(gLen, sizeof(double));
     checkAllocation(v, __LINE__,__FILE__);
     /*compute B^[g]*s */
-    B->multB_hat(B, s, v, g, gLen);
+    B->multB_hat_noShift(B, s, v, g, gLen); /*$$$$$$$$$$$$$$$$$$$$$$$ changed mult*/
     /*compute s^T * B^[g]*s */
     return dotProduct(s, v, gLen);
+}
+
+/*compute modularity Q = s^T*B^[g]*s */
+double computeDeltaQ2(modMat *B, double *s, int *g, int gLen){
+    int i,j,k;
+    double sum, innerSum, sub;
+    for(i=0; i<gLen; i++){
+        for (j = 0; j <gLen ; ++j) {
+            sub=B->getB(B,g[i],g[j]);
+            innerSum=0;
+            if(g[i]==g[j]){
+                for (k = 0; k < gLen ; ++k) {
+                    innerSum+=B->getB(B,g[i],g[k]);
+                }
+            }
+            sub-=innerSum;
+            sum+=(sub*s[i]*s[j]);
+        }
+    }
+    return sum*0.5;
 }
 
 /*Divide the vertices in g into two groups g1,g2 according to s where division[0]=g1 and division[1]=g2

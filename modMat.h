@@ -27,6 +27,9 @@ typedef struct _modMat {
     /*Calc f vector and norm according to g*/
     void (*updateB_Hat)(struct _modMat *B, int *g, int gLen);
 
+    /*??????????delete???????*/
+    void (*multB_hat_noShift)(const struct _modMat *B, const double *v, double *result, int *g, int gLen);
+
     /*Free all allocations*/
     void (*freeModMath)(struct _modMat *mat);
 
