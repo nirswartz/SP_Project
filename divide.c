@@ -50,8 +50,22 @@ double computeModularity(modMat *B, double *s, int *g, int gLen) {
     return result;
 }*/
 
-/*compute modularity Q = s^T*B^[g]*s according to linear algebra*/
+/*compute modularity Q = s^T*B^[g]*s according to linear algebra calculation*/
 double computeModularity(modMat *B, double *s, int *g, int gLen){
+    int i,j;
+    double sum;
+    for(i=0; i<gLen; i++){
+        for (j = 0; j <gLen ; ++j) {
+            if(s[i]!=s[j]){
+                sum+=(-2*B->getB(B,g[i],g[j]));
+            }
+        }
+    }
+    return sum;
+}
+
+/*compute modularity Q = s^T*B^[g]*s according to linear algebra*/
+/*double computeModularity(modMat *B, double *s, int *g, int gLen){
     int i,j,k;
     double sum, innerSum, sub;
     for(i=0; i<gLen; i++){
@@ -67,13 +81,28 @@ double computeModularity(modMat *B, double *s, int *g, int gLen){
             sum+=(sub*s[i]*s[j]);
         }
     }
+    printf("modularity is %f\n",sum);
     return sum;
+}*/
+
+/* couldn't find a good division of g, return g (in division[0])
+ * and an empty group (in division[2]) */
+void gIsIndivisible(int **division, int *g, int gLen){
+    division[0] = g;
+    division[1] = calloc(1, sizeof(int)); /*&&&&&&&&&& check it &&&&&&&&&&&&&*/
+    checkAllocation(division[1],__LINE__,__FILE__);
+    *division[2] = gLen;
+    *division[3] = 0;
 }
 
 /*Divide the vertices in g into two groups g1,g2 according to s where division[0]=g1 and division[1]=g2
  *division[2]=size(g1) and division[3]=size(g2)*/
 void makeDivision(int **division, double *s, int *g, int gLen, int numOfPositive){
     int *g1 , *g2, *p1, *p2, i;
+    if(numOfPositive == gLen || numOfPositive == 0){
+        gIsIndivisible(division, g, gLen);
+        return;
+    }
     g1 = calloc(numOfPositive, sizeof(int));
     checkAllocation(g1, __LINE__,__FILE__);
     g2 = calloc((gLen-numOfPositive), sizeof(int));
@@ -101,16 +130,6 @@ void makeDivision(int **division, double *s, int *g, int gLen, int numOfPositive
     /*free(g);*/
 }
 
-/* couldn't find a good division of g, return g (in division[0])
- * and an empty group (in division[2]) */
-void gIsIndivisible(int **division, int *g, int gLen){
-    division[0] = g;
-    division[1] = calloc(1, sizeof(int)); /*&&&&&&&&&& check it &&&&&&&&&&&&&*/
-    checkAllocation(division[1],__LINE__,__FILE__);
-    *division[2] = gLen;
-    *division[3] = 0;
-}
-
 int countPositiveValues(double *vector,int vectorSize){
     int counter = 0,i;
     for (i = 0; i < vectorSize; ++i) {
@@ -136,7 +155,7 @@ void calcTwoDivision(modMat *B, int **division, int *g, int gLen){
 
     /* stage 1 - compute leading eigenvector */
     powerIteration(B, eigenvector, g, gLen);
-    lambda = computeEigenvalue(B,eigenvector,g,gLen) - (B->last_norm);
+    lambda = computeEigenvalue(B,eigenvector,g,gLen) - (B->norm);
 
     /* stage 2 */
     if(lambda <= 0){
