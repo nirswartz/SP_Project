@@ -158,7 +158,7 @@ void calcTwoDivision(modMat *B, int **division, int *g, int gLen){
     lambda = computeEigenvalue(B,eigenvector,g,gLen) - (B->norm);
 
     /* stage 2 */
-    if(lambda <= 0){
+    if(!IS_POSITIVE(lambda)){
         gIsIndivisible(division, g, gLen);
         free(eigenvector);
         return;
@@ -174,7 +174,7 @@ void calcTwoDivision(modMat *B, int **division, int *g, int gLen){
     /* stage 4 - compute s^T*B_hat[g]*s */
 
     Q = computeModularity(B, s, g, gLen);
-    if (Q <= 0){
+    if (!IS_POSITIVE(Q)){
         gIsIndivisible(division, g, gLen);
         free(eigenvector);
         free(s);
