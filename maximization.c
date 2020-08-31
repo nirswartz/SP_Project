@@ -19,15 +19,14 @@ void initialVector(int *vector, int len){
 /*Calc the score after moving s[k]=-s[k] according to linear algebra calculation*/
 double calcScore(modMat *B, double *s, int *g, int gLen, int i){
     double sum = 0, Ag_ij, Kg_ij;
-    int j;
+    int j, g_i;
+    g_i=g[i];
     for (j = 0; j <gLen ; ++j) {
-        Ag_ij = B->A->getA(B->A,g[i],g[j]);
-        Kg_ij = B->k[g[i]] * B->k[g[j]];
+        Ag_ij = B->A->getA(B->A,g_i,g[j]);
+        Kg_ij = B->k[g_i] * B->k[g[j]];
         sum+=((Ag_ij-(Kg_ij / (double)B->M))*(s[j]));
     }
-    j=i;
-    Kg_ij = B->k[g[i]] * B->k[g[j]];
-    return (4.0 * ( s[i] * sum + (Kg_ij / (double) B->M)));
+    return (4.0 * ( s[i] * sum + (B->k[g_i] * B->k[g_i] / (double) B->M)));
 }
 
 /*Maximize the division from Algorithm 2 like in Algorithm 4*/
