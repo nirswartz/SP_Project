@@ -13,7 +13,7 @@ void countNnz(modMat *B, FILE *fInput){
     for(i = 0; i < B->n ; ++i){
         /*read k_i from file*/
         check = fread(&k_i, sizeof(int), 1, fInput);
-       /* printf("k_%d=%d\n",i,k_i);*/
+        /* printf("k_%d=%d\n",i,k_i);*/
         checkItemsRead(check, 1, __LINE__,__FILE__);
         *kVector = k_i;
         kVector++;
@@ -256,13 +256,13 @@ void calculateNorm(modMat *B){
     double max = B->getB(B,0,0), sum = 0;
 
     for (i = 0; i < B->n ; ++i) {
-    	sum = 0;
-    	for (j = 0; j < B->n ; ++j) {
+        sum = 0;
+        for (j = 0; j < B->n ; ++j) {
             sum += fabs(B->getB(B,i,j));
         }
-    	if(sum > max){
-    		max = sum;
-    	}
+        if(sum > max){
+            max = sum;
+        }
     }
     B->norm = max;
 }
@@ -276,7 +276,7 @@ void updateB_Hat(struct _modMat *B, int *g, int gLen){
     B->last_f = calloc(gLen,sizeof(double));
     checkAllocation(B->last_f, __LINE__, __FILE__);
     fCalc(B, B->last_f, g, gLen);
-   /* B->last_norm = normCalc(B,g,gLen,B->last_f);*/
+    /* B->last_norm = normCalc(B,g,gLen,B->last_f);*/
 }
 
 /* B_hat[g]*v = A[g]*v - (k^T*v*k)/M - f*I*v + ||B_hat[g]||*I*v */
@@ -400,4 +400,3 @@ modMat* modMat_allocate(char *location){
     fclose(fInput);
     return mat;
 }
-

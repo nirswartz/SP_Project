@@ -64,25 +64,24 @@ double computeModularity(modMat *B, double *s, int *g, int gLen){
     return sum;
 }
 
-/*compute modularity Q = s^T*B^[g]*s according to linear algebra*/
-/*double computeModularity(modMat *B, double *s, int *g, int gLen){
-    int i,j,k;
-    double sum, innerSum, sub;
-    for(i=0; i<gLen; i++){
-        for (j = 0; j <gLen ; ++j) {
-            sub=B->getB(B,g[i],g[j]);
-            innerSum=0;
-            if(g[i]==g[j]){
-                for (k = 0; k < gLen ; ++k) {
-                    innerSum+=B->getB(B,g[i],g[k]);
-                }
-            }
-            sub-=innerSum;
-            sum+=(sub*s[i]*s[j]);
-        }
-    }
-    printf("modularity is %f\n",sum);
-    return sum;
+/*compute modularity Q = s^T*B^[g]*s according to linear algebra
+double computeModularity(modMat *B, double *s, int *g, int gLen){
+	int i,j,k;
+	double sum, innerSum, sub;
+	for(i=0; i<gLen; i++){
+		for (j = 0; j <gLen ; ++j) {
+			sub=B->getB(B,g[i],g[j]);
+			innerSum=0;
+			if(g[i]==g[j]){
+				for (k = 0; k < gLen ; ++k) {
+					innerSum+=B->getB(B,g[i],g[k]);
+				}
+			}
+			sub-=innerSum;
+			sum+=(sub*s[i]*s[j]);
+		}
+	}
+	return sum;
 }*/
 
 /* couldn't find a good division of g, return g (in division[0])
@@ -145,7 +144,8 @@ int countPositiveValues(double *vector,int vectorSize){
  * The result is an array division[4] where division[0]=g1 and division[1]=g2
  * division[2]=size(g1) and division[3]=size(g2)*/
 void calcTwoDivision(modMat *B, int **division, int *g, int gLen){
-    double *eigenvector, *s, lambda, Q;
+    double *eigenvector, *s, lambda, Q, *sStart;
+    int i;
 
     eigenvector = calloc(gLen, sizeof(double));
     checkAllocation(eigenvector, __LINE__,__FILE__);
@@ -153,37 +153,42 @@ void calcTwoDivision(modMat *B, int **division, int *g, int gLen){
     /*Update f vector and norm of new B^[g] before multiplication in power iteration*/
     B->updateB_Hat(B,g,gLen);
 
-    /* stage 1 - compute leading eigenvector */
+    /* compute leading eigenvector */
     powerIteration(B, eigenvector, g, gLen);
     lambda = computeEigenvalue(B,eigenvector,g,gLen) - (B->norm);
 
-    /* stage 2 */
-    if(!IS_POSITIVE(lambda)){
-        gIsIndivisible(division, g, gLen);
-        free(eigenvector);
-        return;
-    }
-
-    /* stage 3 - compute s */
     s = calloc(gLen, sizeof(double));
-    createS(eigenvector, s, gLen);
+    checkAllocation(s, __LINE__,__FILE__);
+    sStart = s;
 
-    /*Maximize modularity of division of vector s*/
-    maxDivision(B, s, g, gLen);
+    if(IS_POSITIVE(lambda)){
+        /* compute s */
+        createS(eigenvector, s, gLen);
+        /*compute s^T*B_hat[g]*s */
+        Q = computeModularity(B, s, g, gLen);
 
-    /* stage 4 - compute s^T*B_hat[g]*s */
+        if(!IS_POSITIVE(Q)){
+            /* compute s */
+            for (i = 0; i < gLen; ++i) {
+                *s = 1;
+                s++;
+            }
+            s = sStart;
+        }
+        /*Maximize modularity of division of vector s*/
+        maxDivision(B, s, g, gLen);
 
-    Q = computeModularity(B, s, g, gLen);
-    if (!IS_POSITIVE(Q)){
-        gIsIndivisible(division, g, gLen);
-        free(eigenvector);
-        free(s);
-        return;
+        /*compute s^T*B_hat[g]*s */
+        Q = computeModularity(B, s, g, gLen);
+        if (IS_POSITIVE(Q)){
+            /* divide s into g_1 and g_2 */
+            makeDivision(division,s,g,gLen,countPositiveValues(s,gLen));
+            free(eigenvector);
+            free(s);
+            return;
+        }
     }
-
-    /* stage 5 - divide s into g_1 and g_2 */
-    makeDivision(division,s,g,gLen,countPositiveValues(s,gLen));
-
+    gIsIndivisible(division, g, gLen);
     free(eigenvector);
     free(s);
 }

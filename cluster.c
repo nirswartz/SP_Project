@@ -6,7 +6,8 @@
 #include "linkedList.h"
 #include "divide.h"
 #include "modMat.h"
-/*#include "cluster.h" *//*$$$$$$$$$$$ to delete 444444444444*/
+/*#include "cluster.h"*/
+
 
 void writeGroupsToFile(linkedList *O, char *locationOutput){
     FILE *fOutput;
@@ -163,11 +164,6 @@ int main(int argc, char* argv[]){
 }
 /*
 int main(){
-    clock_t t;
-    t = clock();
     test10();
-    t = clock() - t;
-    double time_taken = (((double)t)/CLOCKS_PER_SEC); // in seconds
-    printf("\ntime9() took %f seconds to execute \n", time_taken);
     return 0;
 }*/
