@@ -51,7 +51,6 @@ void maxDivision(modMat *B, double *s, int *g, int gLen) {
                 if (*unmoved != -1) {
                     *s = -(*s);
                     score = calcScore(B,sStart,g,gLen,k);
-                    /*printf("score is %f\n",score);*/
                     /*compute max{score[j] : j in Unmoved}*/
                     if (score > max_score) {
                         max_score = score;

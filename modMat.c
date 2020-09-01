@@ -7,6 +7,16 @@
 #include "eigen.h"
 #include "math.h"
 
+
+
+
+
+
+
+
+
+
+
 /* calculate k vector and M (nnz) */
 void countNnz(modMat *B, FILE *fInput){
     int M = 0, i, k_i, check, *kVector = B->k,j;

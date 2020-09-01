@@ -1,13 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-/*#include "help.h"*/
 #include "errors.h"
 #include "linkedList.h"
 #include "divide.h"
 #include "modMat.h"
-/*#include "cluster.h"*/
-
+/*#include "cluster.h"
+#include "help.h"*/
 
 void writeGroupsToFile(linkedList *O, char *locationOutput){
     FILE *fOutput;
@@ -160,7 +159,6 @@ int main(int argc, char* argv[]){
     printf("\nRun for %f vertexes took %f seconds to execute \n",vertexes, time_taken);
 
     return 0;
-
 }
 /*
 int main(){
