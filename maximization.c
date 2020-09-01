@@ -7,7 +7,7 @@
 
 #define IS_POSITIVE(X)((X)>0.00001)
 
-/* make a copy of original vector into copy vector */
+/* Initial a vector with values {0,1,2,..., len-1} */
 void initialVector(int *vector, int len){
     int i;
     for (i = 0; i < len; ++i) {
@@ -51,6 +51,7 @@ void maxDivision(modMat *B, double *s, int *g, int gLen) {
                 if (*unmoved != -1) {
                     *s = -(*s);
                     score = calcScore(B,sStart,g,gLen,k);
+                    /*printf("score is %f\n",score);*/
                     /*compute max{score[j] : j in Unmoved}*/
                     if (score > max_score) {
                         max_score = score;
@@ -82,7 +83,7 @@ void maxDivision(modMat *B, double *s, int *g, int gLen) {
         }
 
         /* lines 21 - 30: find the maximum improvement of s and update s accordingly*/
-        for (k = gLen - 1; k > maxIndexInImprove; k--) {
+        for (k = gLen - 1; k > maxIndexInImprove+1; k--) {
             indices--;
             s[*indices] = -s[*indices];
         }
