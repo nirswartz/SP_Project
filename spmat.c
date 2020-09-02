@@ -3,27 +3,16 @@
 #include "spmat.h"
 #include "errors.h"
 
-void printSparse(struct _spmat *A){
-    int nnz = *((A->row)+((A->n)));
-    int i;
-    printf("{");
-    for (i = 0; i < nnz-1; ++i) {
-        printf("%f,",*((A->values)+i));
-    }
-    printf("%f}\n",*((A->values)+i));
-    printf("{");
-    for (i = 0; i < nnz-1; ++i) {
-        printf("%d,",*((A->col)+i));
-    }
-    printf("%d}\n",*((A->col)+i));
-    printf("{");
-    for (i = 0; i < A->n; ++i) {
-        printf("%d,",*((A->row)+i));
-    }
-    printf("%d}\n",*((A->row)+i));
-}
+/* functions deceleration */
+void add_row_sparse(spmat *A, const double *row, int i);
+void free_sparse(spmat *A);
+void mult_sparse(const spmat *A, const double *v, double *result, int *g, int gLen);
+double getter_sparse(const spmat *A, int i, int j);
+spmat* spmat_allocate(int n, int nnz);
+void print_sparse(spmat *A); /*deleteeeeee*/
+/*end of functions declaration*/
 
-void add_row(struct _spmat *A, const double *row, int i){
+void add_row_sparse(spmat *A, const double *row, int i){
     double *valPtr = (A->values)+(A->row[i]);
     int *colPtr = (A->col)+(A->row[i]);
     int cntNz = 0, col;
@@ -40,13 +29,13 @@ void add_row(struct _spmat *A, const double *row, int i){
     A->row[i+1] = A->row[i] + cntNz;
 }
 
-void freeMat(struct _spmat *A){
+void free_sparse(spmat *A){
     free(A->values);
     free(A->col);
     free(A->row);
 }
 
-void mult(const struct _spmat *A, const double *v, double *result, int *g, int gLen){
+void mult_sparse(const spmat *A, const double *v, double *result, int *g, int gLen){
     int i,j, *gI = g, *gJ = g;
     const double *p;
     double sum;
@@ -54,7 +43,7 @@ void mult(const struct _spmat *A, const double *v, double *result, int *g, int g
         sum=0.0;
         p = v;
         for (j = 0; j < gLen; j++) {
-            sum+=((A->getA(A,*gI,*gJ))* *p);
+            sum+=((getter_sparse(A,*gI,*gJ))* *p);
             gJ++;
             p++;
         }
@@ -122,7 +111,7 @@ void mult(const struct _spmat *A, const double *v, double *result, int *g, int g
 }*/
 
 /* getter for A(i,j) when i is the row and j is the column */
-double getA(const struct _spmat *A, int i, int j){
+double getter_sparse(const spmat *A, int i, int j){
     int x, y , *col;
 
     x = (A->row)[i+1] - (A->row)[i];
@@ -145,19 +134,8 @@ double getA(const struct _spmat *A, int i, int j){
     return 0.0;
 }
 
-double doProductByRow(const struct _spmat *A, int rowNum, const double *v){
-    int numberOfElements = A->row[rowNum+1] - A->row[rowNum], i;
-    double *valPtr = (A->values)+(A->row[rowNum]), sum = 0;
-    int *colPtr = (A->col)+(A->row[rowNum]);
-    for (i = 0; i < numberOfElements; ++i) {
-        sum += *valPtr * v[*colPtr];
-        valPtr++;
-        colPtr++;
-    }
-    return sum;
-}
-
-spmat* spmat_allocate_array(int n, int nnz){
+/* Allocates a new arrays sparse matrix of size n with nnz non-zero elements*/
+spmat* spmat_allocate(int n, int nnz){
     spmat *sparse = malloc(sizeof(spmat));
     checkAllocation(sparse, __LINE__,__FILE__);
     sparse->n = n;
@@ -167,51 +145,26 @@ spmat* spmat_allocate_array(int n, int nnz){
     checkAllocation(sparse->col, __LINE__,__FILE__);
     sparse->row = (int*) calloc(n+1,sizeof(int));
     checkAllocation(sparse->row, __LINE__,__FILE__);
-    sparse->add_row=&add_row;
-    sparse->mult=&mult;
-    sparse->free=&freeMat;
-    sparse->getA = &getA;
-    sparse->printSparse=&printSparse;
-    sparse->doProductByRow=&doProductByRow;
     return sparse;
 }
 
-/*spmat* spmat_allocate_array(int n, int nnz){
-    int error;
-    spmat *sparse = malloc(sizeof(spmat));
-    error=checkAllocation(sparse, __LINE__,__FILE__);
-    if (error!=0){
-        free(sparse);
-        exit(error);
+/*to deleteeeeeeeeeeeeeeeeeeee*/
+void print_sparse(spmat *A){
+    int nnz = *((A->row)+((A->n)));
+    int i;
+    printf("{");
+    for (i = 0; i < nnz-1; ++i) {
+        printf("%f,",*((A->values)+i));
     }
-    sparse->n = n;
-    sparse->values = (double*) calloc(nnz,sizeof(double));
-    error=checkAllocation(sparse->values, __LINE__,__FILE__);
-    if (error!=0){
-        free(sparse->values);
-        free(sparse);
-        exit(error);
+    printf("%f}\n",*((A->values)+i));
+    printf("{");
+    for (i = 0; i < nnz-1; ++i) {
+        printf("%d,",*((A->col)+i));
     }
-    sparse->col = (int*) calloc(nnz,sizeof(int));
-    error=checkAllocation(sparse->col, __LINE__,__FILE__);
-    if (error!=0){
-        free(sparse->values);
-        free(sparse->col);
-        free(sparse);
-        exit(error);
+    printf("%d}\n",*((A->col)+i));
+    printf("{");
+    for (i = 0; i < A->n; ++i) {
+        printf("%d,",*((A->row)+i));
     }
-    sparse->row = (int*) calloc(n+1,sizeof(int));
-    error=checkAllocation(sparse->row, __LINE__,__FILE__);
-    if (error!=0){
-        freeMat(sparse);
-        free(sparse);
-        exit(error);
-    }
-    sparse->add_row=&add_row;
-    sparse->mult=&mult;
-    sparse->free=&freeMat;
-    sparse->getA = &getA;
-    sparse->printSparse=&printSparse;
-    sparse->doProductByRow=&doProductByRow;
-    return sparse;
-}*/
+    printf("%d}\n",*((A->row)+i));
+}

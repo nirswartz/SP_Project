@@ -59,7 +59,7 @@ spmat* fileToSparseMatrix(char *location) {
     n = fread(&vectorSize, sizeof(int), 1, fInput);
     checkItemsRead(n,1,__LINE__,__FILE__);
     n=checkNNZ(fInput, vectorSize);
-    matrix=spmat_allocate_array(vectorSize, n);
+    matrix=spmat_allocate(vectorSize, n);
 
     /*initialize row and*/
     matrixRow = calloc(vectorSize,sizeof(double));
@@ -70,7 +70,7 @@ spmat* fileToSparseMatrix(char *location) {
         /*read line in cov matrix*/
         n=fread(matrixRow, sizeof(double), vectorSize, fInput);
         checkItemsRead(n,vectorSize,__LINE__,__FILE__);
-        matrix->add_row(matrix,matrixRow,i);
+        add_row_sparse(matrix,matrixRow,i);
     }
     fclose(fInput);
     free(matrixRow);
@@ -231,7 +231,7 @@ void test1(){
     printf("\n");
 
     spmat *matrix=fileToSparseMatrix(inputL);
-    matrix->printSparse(matrix);
+   /* matrix->printSparse(matrix);*/
     printf("\n");
 
     calcEigenVectorAndWrite(matrix,outputL);
@@ -314,12 +314,12 @@ void test5(){
     double res[3];
     spmat *mys = NULL;
 
-    mys=spmat_allocate_array(5,12);
+    mys=spmat_allocate(5,12);
     for (i = 0; i < 5; ++i) {
-        mys->add_row(mys, arr[i], i);
+        add_row_sparse(mys, arr[i], i);
     }
 
-    mys->mult(mys,v,res,g,3);
+    mult_sparse(mys,v,res,g,3);
     printVectorDouble(res,3);
 }
 
@@ -345,8 +345,8 @@ void test7(){
     double *result=calloc(3, sizeof(double));
     myMat = modMat_allocate(f1);
     printB(myMat);
-    myMat->updateB_Hat(myMat,g,3);
-    myMat->multB_hat(myMat,v,result,g,3);
+    update_HatB_f_vector(myMat,g,3);
+    mult_HatB(myMat,v,result,g,3);
     printVectorDouble(result,3);
 }
 /* make same graph as given by Moshe */
@@ -379,7 +379,7 @@ void test9(){
     printVectorInt(division[0],*division[2]);
     printf("g2:\n");
     printVectorInt(division[1],*division[3]);*/
-    calcTwoDivision(B,division,g1,13);
+    calc_two_division(B,division,g1,13);
     printf("g1 divided:\n");
     printf("g1:\n");
     printVectorInt(division[0],*division[2]);
@@ -397,4 +397,16 @@ void test10(){
         arr[2]=locationOutput;
         cluster(10,arr);
         printFinalGroups(locationOutput);
+};
+
+/* test specific graph on NOVA*/
+void test11(){
+    char *locationInput="inputs\\tester_binary.input";
+    char *locationOutput="outputs\\tester_binary.output";
+    char *arr[3];
+    arr[0]="sonia and nir are the best!";
+    arr[1]=locationInput;
+    arr[2]=locationOutput;
+    cluster(10,arr);
+    printFinalGroups(locationOutput);
 };

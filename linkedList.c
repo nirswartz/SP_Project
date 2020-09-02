@@ -1,10 +1,20 @@
-#include "linkedList.h"
-#include "errors.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "linkedList.h"
+#include "errors.h"
+
+/*function declaration*/
+void insert_first(linkedList *list, int *data, int size);
+void insert_last(linkedList *list, int *data, int size);
+void  delete_first(linkedList *list, int contentFlag);
+void delete_list_by_head(node *head);
+void free_linkedList(linkedList *list);
+linkedList* linkedList_allocate();
+void printList(linkedList *list); /*deleteeeeee*/
+/*end of functions declaration*/
 
 /*Insert new node to the list at the first place*/
-void insert_first(struct _linkedList *list, int* data, int size){
+void insert_first(linkedList *list, int* data, int size){
     node *tmp=(node*)malloc(sizeof(node));
     checkAllocation(tmp,__LINE__,__FILE__);
     tmp->data=data;
@@ -22,7 +32,7 @@ void insert_first(struct _linkedList *list, int* data, int size){
 }
 
 /*Insert new node to the list at the last place*/
-void insert_last(struct _linkedList *list, int* data, int size){
+void insert_last(linkedList *list, int* data, int size){
     node *tmp=(node*)malloc(sizeof(node));
     checkAllocation(tmp,__LINE__,__FILE__);
     tmp->data=data;
@@ -40,7 +50,7 @@ void insert_last(struct _linkedList *list, int* data, int size){
 }
 
 /*Delete the first node from the list. If contentFlag==1, so the data will be deleted as well*/
-void delete_first(struct _linkedList *list, int contentFlag){
+void delete_first(linkedList *list, int contentFlag){
     node *tmp;
     checkEmptyList(list->len,__LINE__,__FILE__);
     tmp=list->head;
@@ -57,35 +67,33 @@ void delete_first(struct _linkedList *list, int contentFlag){
     list->len--;
 }
 
-/*Delete the last node from the list. If contentFlag==1, so the data will be deleted as well*/
-/*O(n)!*/
-void delete_last(struct _linkedList *list, int contentFlag){
-    node *tmp;
-    checkEmptyList(list->len,__LINE__,__FILE__);
-    tmp=list->head;
-    if(list->len==1){
-        list->head=NULL;
-        list->tail=NULL;
-    } else{
-        while(tmp->next != list->tail){
-            tmp=tmp->next;
-        }
-        list->tail=tmp;
-        tmp=tmp->next;
-        list->tail->next=NULL;
+/*use recursive way to delete all nodes from the end to the beginning*/
+void delete_list_by_head(node *head){
+    if(head!=NULL){
+        delete_list_by_head(head->next);
+        free(head->data);
+        free(head);
     }
-    if(contentFlag==1){
-        free(tmp->data);
-    }
-    free(tmp);
-    list->len--;
 }
 
-/*
-void deleteNode(linkedList *list, node nodeDelete){
-}*/
+/*Free all nodes include the data*/
+void free_linkedList(linkedList *list){
+    delete_list_by_head(list->head);
+    list->head=NULL;
+    list->tail=NULL;
+    list->len=0;
+}
 
-/*Print the list*/
+linkedList* linkedList_allocate(){
+    linkedList *list = malloc(sizeof(linkedList));
+    checkAllocation(list, __LINE__,__FILE__);
+    list->len = 0;
+    list->head=NULL;
+    list->tail=NULL;
+    return list;
+}
+
+/*Print the list - deleteeeeeeeeeee*/
 void printList(struct _linkedList *list){
     int len,i,j,*val;
     node *tmp;
@@ -117,37 +125,4 @@ void printList(struct _linkedList *list){
         printf("} -> NULL\n");
     }
 
-}
-
-/*use recursive way to delete all nodes from the end to the beginning*/
-void deleteListByHead(node *head){
-    if(head!=NULL){
-        deleteListByHead(head->next);
-        free(head->data);
-        free(head);
-    }
-}
-
-/*Free all nodes include the data*/
-void freeList(struct _linkedList *list){
-    deleteListByHead(list->head);
-    list->head=NULL;
-    list->tail=NULL;
-    list->len=0;
-}
-
-linkedList* linkedList_allocate(){
-    linkedList *list = malloc(sizeof(linkedList));
-    checkAllocation(list, __LINE__,__FILE__);
-    list->len = 0;
-    list->head=NULL;
-    list->tail=NULL;
-    list->insert_first=&insert_first;
-    list->insert_last=&insert_last;
-    list->delete_first=&delete_first;
-    list->delete_last = &delete_last;
-    /*list->deleteNode=&deleteNode;*/
-    list->printList=&printList;
-    list->freeList=&freeList;
-    return list;
 }

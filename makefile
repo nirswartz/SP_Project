@@ -21,10 +21,10 @@ errors.o: errors.c errors.h
 linkedList.o: linkedList.c linkedList.h errors.h
 	gcc $(FLAGS) -c linkedList.c
 
-maximization.o: maximization.c maximization.h errors.h divide.h modMat.h
+maximization.o: maximization.c maximization.h errors.h modMat.h
 	gcc $(FLAGS) -c maximization.c
 
-modMat.o: modMat.c modMat.h errors.h spmat.h eigen.h
+modMat.o: modMat.c modMat.h errors.h spmat.h
 	gcc $(FLAGS) -c modMat.c
 
 spmat.o: spmat.c spmat.h errors.h

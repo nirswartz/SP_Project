@@ -2,24 +2,10 @@
 #define SP_PROJECT_EIGEN_H
 #include "modMat.h"
 
-
-/*create b0, fill it with random values*/
-void initialization(double *arr, int rowLength);
+/*calculating dominant eigen vector of B^[g]*, result will be placed in vector*/
+void power_iteration(modMat *B, double *vector, int *g, int gLen);
 
 /*calculating dot product of two rows*/
-double dotProduct(double* row1,double* row2,int rowLength);
-
-/* (Ab) / (||Ab||) */
-void normalized(double* arr, double norm, int rowLength);
-
-/*calculating next eigenvector*/
-/* return the norm of bNew*/
-void nextVector(spmat *matrix, double* b, double* bNew, int rowLength);
-
-/* check if the change in the new vector is small enough*/
-int bigDifference(double *b, double* bNew, int rowLength);
-
-/*calculating dominant eigen vector */
-void powerIteration(modMat *B, double *vector, int *g, int gLen);
+double dot_product(double* row1,double* row2,int rowLength);
 
 #endif

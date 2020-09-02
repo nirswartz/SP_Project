@@ -1,6 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* functions deceleration */
+void checkAllocation(void* pointer, int rowNum, char *programName);
+void checkItemsRead(int read, int shouldRead, int rowNum, char *programName);
+void checkItemsWrite(int write, int shouldWrite, int rowNum, char *programName);
+void checkDivideByZero(double num, int rowNum, char *programName);
+void checkOpenFile(void *open, char *fileName, int rowNum, char *programName);
+void checkEmptyList(int len, int rowNum, char *programName);
+/* end of functions deceleration */
 
 void checkAllocation(void* pointer, int rowNum, char *programName){
     if(pointer==NULL){
@@ -44,45 +52,3 @@ void checkEmptyList(int len, int rowNum, char *programName){
         exit(60);
     }
 }
-
-/*int checkAllocation(void* pointer, int rowNum, char *programName){
-    if(pointer==NULL){
-        printf("Allocation Failed in line: %d in program: %s\n",rowNum, programName);
-        return 10;
-    }
-    return 0;
-}
-
-int checkItemsRead(int read, int shouldRead, int rowNum, char *programName){
-    if(read!=shouldRead){
-        printf("Read Failed! Should read %d items, but read %d items in line: %d in program: %s\n",shouldRead,read,rowNum, programName);
-        return 20;
-    }
-    return 0;
-}
-
-int checkItemsWrite(int write, int shouldWrite, int rowNum, char *programName){
-    if(write!=shouldWrite){
-        printf("Write Failed! Should write %d items, but write %d items in line: %d in program: %s\n",shouldWrite,write,rowNum, programName);
-        return 30;
-    }
-    return 0;
-}
-
-int checkDivideByZero(int num, int rowNum, char *programName){
-    if(num==0){
-        printf("Divide by zero in line: %d in program: %s\n",rowNum, programName);
-        return 40;
-    }
-    return 0;
-}
-
-int checkOpenFile(void *open, char *fileName, int rowNum, char *programName){
-    if(open==NULL){
-        printf("Couldn't open: %s in line: %d in program: %s\n",fileName,rowNum, programName);
-        return 50;
-    }
-    return 0;
-}
-*/
-
