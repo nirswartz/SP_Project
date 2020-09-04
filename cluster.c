@@ -12,8 +12,8 @@
 
 /* function deceleration */
 int main(int argc, char* argv[]);
-void initializationOfGroups(linkedList *P, int n);
-void writeGroupsToFile(linkedList *O, char *locationOutput);
+void initialization_of_groups(linkedList *P, int n);
+void write_groups_to_file(linkedList *O, char *locationOutput);
 /* end of function deceleration */
 
 /*change to mainnnnnnnnnnnnnnnnnnnnnnnnnn*/
@@ -46,7 +46,7 @@ int cluster(int argc, char* argv[]){
     /* Stage 1+2 - initialization Of P and O*/
     P = linkedList_allocate();
     O = linkedList_allocate();
-    initializationOfGroups(P, B->n);
+    initialization_of_groups(P, B->n);
 
     /* Stage 3 - calculating the modularity groups*/
     while((P->len) > 0){
@@ -99,7 +99,7 @@ int cluster(int argc, char* argv[]){
     }
 
     /* Stage 4 - write the output division to File*/
-    writeGroupsToFile(O,locationOutput);
+    write_groups_to_file(O,locationOutput);
 
     /*delete*/
     vertexes=(double)B->n;
@@ -129,10 +129,23 @@ int cluster(int argc, char* argv[]){
     return 0;
 }
 
+/* initializing P = {{0,...,n-1}} in order to start the algorithm*/
+void initialization_of_groups(linkedList *P, int n){
+    int *trivial,i;
+    /*Creating the trivial division of {1,2,...,n}*/
+    trivial=(int*)malloc(n * sizeof(int));
+    checkAllocation(trivial,__LINE__,__FILE__);
+    for(i=0;i<n;i++){
+        trivial[i] = i;
+    }
+    insert_first(P,trivial,n); /* P = {{0,...,n-1}}, O = {} */
+}
+
+
 /* Write to output file the groups
  * Writing for each group the group's size followed by the group's nodes in increasing order
  * (n_g)(n_g1)(g1)(n_g2)(g2)(n_g3)(g3)... */
-void writeGroupsToFile(linkedList *O, char *locationOutput){
+void write_groups_to_file(linkedList *O, char *locationOutput){
     FILE *fOutput;
     int *group, size, len, check, i;
     node *tmp = O->head;
@@ -157,18 +170,6 @@ void writeGroupsToFile(linkedList *O, char *locationOutput){
         tmp = tmp->next;
     }
     fclose(fOutput);
-}
-
-/* initializing P = {{0,...,n-1}} in order to start the algorithm*/
-void initializationOfGroups(linkedList *P, int n){
-    int *trivial,i;
-    /*Creating the trivial division of {1,2,...,n}*/
-    trivial=(int*)malloc(n * sizeof(int));
-    checkAllocation(trivial,__LINE__,__FILE__);
-    for(i=0;i<n;i++){
-        trivial[i] = i;
-    }
-    insert_first(P,trivial,n); /* P = {{0,...,n-1}}, O = {} */
 }
 
 /*deleteeeeeeeeeeeeeeeeeee*/

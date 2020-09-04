@@ -15,7 +15,7 @@ void mult_HatB(const modMat *B, const double *v, double *result, int *g, int gLe
 void update_HatB_f_vector(modMat *B, int *g, int gLen);
 void free_modMat(modMat *mat);
 modMat* modMat_allocate(char *location);
-void updated_vector_by_indices_with_value(double *vector,int *indices, int indicesLen, double value);
+/*void updated_vector_by_indices_with_value(double *vector,int *indices, int indicesLen, double value);*/
 void load_data_from_input_file(modMat *B, char *location);
 void calc_f_vector(const modMat *B, double *f, int *g, int gLen);
 /*double calc_norm(const modMat *B,  double *f, int *g, int gLen);*/ /*deleteeeeeee*/
@@ -151,13 +151,14 @@ modMat* modMat_allocate(char *location){
 }
 
 /*update the vector's values in specific indexes to the same value*/
+/*
 void updated_vector_by_indices_with_value(double *vector,int *indices, int indicesLen, double value){
     int i=0;
     for(i = 0; i < indicesLen ; ++i){
         vector[*indices] = value;
         indices++;
     }
-}
+}*/
 
 /* load all data from input file: n(number of nodes), k vector, M(nnz) and create sparse matrix of A*/
 void load_data_from_input_file(modMat *B, char *location){
@@ -200,12 +201,8 @@ void load_data_from_input_file(modMat *B, char *location){
         check = fread(indices, sizeof(int), k_i, fInput);
         checkItemsRead(check,k_i,__LINE__,__FILE__);
 
-        /*Update row according to indices from file and add it to sparse matrix A*/
-        updated_vector_by_indices_with_value(row,indices,k_i,1.0);
-        add_row_sparse(B->A, row, i);
-
-        /*initialization of row*/
-        updated_vector_by_indices_with_value(row,indices,k_i,0.0);
+        /*Add indices row to sparse matrix A*/
+        add_row_sparse(B->A,indices,k_i,i);
     }
     fclose(fInput);
 }

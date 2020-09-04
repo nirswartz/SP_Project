@@ -70,7 +70,7 @@ spmat* fileToSparseMatrix(char *location) {
         /*read line in cov matrix*/
         n=fread(matrixRow, sizeof(double), vectorSize, fInput);
         checkItemsRead(n,vectorSize,__LINE__,__FILE__);
-        add_row_sparse(matrix,matrixRow,i);
+        /*add_row_sparse(matrix,matrixRow,i);*/
     }
     fclose(fInput);
     free(matrixRow);
@@ -316,7 +316,7 @@ void test5(){
 
     mys=spmat_allocate(5,12);
     for (i = 0; i < 5; ++i) {
-        add_row_sparse(mys, arr[i], i);
+        /*add_row_sparse(mys, arr[i], i);*/
     }
 
     mult_sparse(mys,v,res,g,3);
@@ -409,4 +409,4 @@ void test11(){
     arr[2]=locationOutput;
     cluster(10,arr);
     printFinalGroups(locationOutput);
-};
+}
