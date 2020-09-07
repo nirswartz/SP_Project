@@ -12,7 +12,7 @@ double getter_B(const modMat *B, int i, int j);
 double getter_HatB(const modMat *B, int i, int j, int *g, int gLen);
 void mult_HatB(const modMat *B, const double *v, double *result, int *g, int gLen);
 /*void multB_hat_noShift(const struct _modMat *B, const double *v, double *result, int *g, int gLen)*/ /*deleteeeeeeeeeeee*/
-void update_HatB_f_vector(modMat *B, int *g, int gLen);
+void update_HatB_vectors(modMat *B, int *g, int gLen);
 void free_modMat(modMat *mat);
 modMat* modMat_allocate(char *location);
 /*void updated_vector_by_indices_with_value(double *vector,int *indices, int indicesLen, double value);*/
@@ -61,8 +61,9 @@ double getter_HatB(const modMat *B, int i, int j, int *g, int gLen){
 /* B_hat[g]*v = A[g]*v - (k^T*v*k)/M - f*I*v + ||B_hat[g]||*I*v */
 void mult_HatB(const modMat *B, const double *v, double *result, int *g, int gLen){
     double *tmp, scalar;
-    tmp = calloc(gLen,sizeof(double));
-    checkAllocation(tmp, __LINE__,__FILE__);
+
+    /*Using calc double vector of B instead of allocate new vector*/
+    tmp = B->calc_double_vector;
 
     /* calculating A*v */
     mult_sparse(B->A,v,result,g,gLen);
@@ -70,19 +71,18 @@ void mult_HatB(const modMat *B, const double *v, double *result, int *g, int gLe
     /* calculating ((k^T*v)/M)* k */
     scalar = (dot_product_by_g(B->k, v, g,gLen)) / B->M;
     vector_scalar_mult_by_g(B->k, scalar, tmp,g, gLen);
-    /*add tmp to result*/
+    /*subtract tmp from result*/
     vector_subtraction(result, tmp, gLen);
 
     /* calculating f*I*v */
     vector_mult(B->last_f, v, tmp, gLen);
-    /*add tmp to result*/
+    /*subtract tmp from result*/
     vector_subtraction(result, tmp, gLen);
 
     /* calculating ||B_hat||*v */
     vector_scalar_mult(v,B->norm, tmp, gLen);
     /*add tmp to result*/
     vector_addition(result, tmp, gLen);
-    free(tmp);
 }
 
 /* B_hat[g]*v = A[g]*v - (k^T*v*k)/M - f*I*v + ||B_hat[g]||*I*v */
@@ -111,14 +111,19 @@ void mult_HatB(const modMat *B, const double *v, double *result, int *g, int gLe
 }*/
 
 /*Calc f vector according to g*/
-void update_HatB_f_vector(modMat *B, int *g, int gLen){
+void update_HatB_vectors(modMat *B, int *g, int gLen){
     /* create f according to g */
     if(B->last_f != NULL){
         free(B->last_f);
     }
+    if(B->calc_double_vector != NULL){
+        free(B->calc_double_vector);
+    }
     B->last_f = calloc(gLen,sizeof(double));
     checkAllocation(B->last_f, __LINE__, __FILE__);
     calc_f_vector(B, B->last_f, g, gLen);
+    B->calc_double_vector = calloc(gLen,sizeof(double));
+    checkAllocation(B->calc_double_vector, __LINE__, __FILE__);
 }
 
 /*Free all allocations*/
@@ -128,6 +133,9 @@ void free_modMat(modMat *mat){
     free(mat->k);
     if(mat->last_f != NULL){
         free(mat->last_f);
+    }
+    if(mat->calc_double_vector != NULL){
+        free(mat->calc_double_vector);
     }
 }
 
@@ -142,10 +150,11 @@ modMat* modMat_allocate(char *location){
     load_data_from_input_file(mat,location);
 
     /*initialize norm of B */
-    mat->norm=calc_norm(mat);
+    mat->norm = calc_norm(mat);
 
-    /*initialize f vector and norm*/
-    mat->last_f=NULL;
+    /*initialize f vector and calc vector*/
+    mat->last_f = NULL;
+    mat->calc_double_vector = NULL;
 
     return mat;
 }
@@ -163,7 +172,6 @@ void updated_vector_by_indices_with_value(double *vector,int *indices, int indic
 /* load all data from input file: n(number of nodes), k vector, M(nnz) and create sparse matrix of A*/
 void load_data_from_input_file(modMat *B, char *location){
     int i, k_i, check, *kVector, *indices;
-    double *row;
     struct stat info;
     FILE *fInput;
 
@@ -184,8 +192,6 @@ void load_data_from_input_file(modMat *B, char *location){
     B->M = (info.st_size/sizeof(int)) - (B->n+1);
 
     /*Initialization of sparse matrix and data vectors*/
-    row = calloc(B->n,sizeof(double));
-    checkAllocation(row,__LINE__,__FILE__);
     indices = calloc(B->n,sizeof(int));
     checkAllocation(indices,__LINE__,__FILE__);
     B->A = spmat_allocate(B->n, B->M);
@@ -205,6 +211,7 @@ void load_data_from_input_file(modMat *B, char *location){
         add_row_sparse(B->A,indices,k_i,i);
     }
     fclose(fInput);
+    free(indices);
 }
 
 /* create vector (f_1,f_2,...,f_gLen) according to g, result will be placed in f */

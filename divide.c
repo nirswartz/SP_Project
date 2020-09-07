@@ -29,7 +29,7 @@ void calc_two_division(modMat *B, int **division, int *g, int gLen){
     checkAllocation(eigenvector, __LINE__,__FILE__);
 
     /*Update f vector of new B^[g] before multiplication in power iteration*/
-    update_HatB_f_vector(B,g,gLen);
+    update_HatB_vectors(B,g,gLen);
 
     /* compute leading eigenvector */
     power_iteration(B, eigenvector, g, gLen);
@@ -58,7 +58,6 @@ void calc_two_division(modMat *B, int **division, int *g, int gLen){
         }
         /*Maximize modularity of division of vector s*/
         max_division(B, s, g, gLen);
-
         /*compute s^T*B_hat[g]*s */
         Q = compute_modularity(B, s, g, gLen);
         if (IS_POSITIVE(Q)){
@@ -114,6 +113,7 @@ double compute_eigen_value(modMat *B ,double *eigenvector, int *g, int gLen){
     /* compute (eigenvector^T * eigenvector) */
     dot2 = dot_product(eigenvector,eigenvector,gLen);
     checkDivideByZero(dot2, __LINE__,__FILE__);
+    free(v);
     return (dot1 / dot2);
 }
 
@@ -151,7 +151,7 @@ void g_is_indivisible(int **division, int *g, int gLen){
 /*Divide the vertices in g into two groups g1,g2 according to s where division[0]=g1 and division[1]=g2
  *division[2]=size(g1) and division[3]=size(g2)*/
 void make_division(int **division, double *s, int *g, int gLen, int numOfPositive){
-    int *g1 , *g2, *p1, *p2, i;
+    int *g1 , *g2, *p1, *p2, i, *gStart;
     if(numOfPositive == gLen || numOfPositive == 0){
         g_is_indivisible(division, g, gLen);
         return;
@@ -161,6 +161,7 @@ void make_division(int **division, double *s, int *g, int gLen, int numOfPositiv
     g2 = calloc((gLen-numOfPositive), sizeof(int));
     checkAllocation(g2, __LINE__,__FILE__);
 
+    gStart = g;
     p1 = g1;
     p2 = g2;
     for (i = 0; i < gLen; ++i) {
@@ -175,12 +176,12 @@ void make_division(int **division, double *s, int *g, int gLen, int numOfPositiv
         g++;
         s++;
     }
-
     division[0] = p1;
     division[1] = p2;
     *division[2] = numOfPositive;
     *division[3] = (gLen-numOfPositive);
-    /*free(g);*/
+    g = gStart;
+    free(g);
 }
 
 /* Count how many positive values are in vector*/

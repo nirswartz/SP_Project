@@ -46,11 +46,11 @@ void mult_sparse(const spmat *A, const double *v, double *result, int *g, int gL
         valuesInRow= *(skipValues+1) - *skipValues;
         sum = 0;
         for (j = 0; j < gLen && 0 < valuesInRow ; ++j) {
-            while(*colPtr < *g && 0 < valuesInRow){
+            while( 1 <= valuesInRow && *colPtr < *g){
                 colPtr++;
                 valuesInRow--;
             }
-            if(*colPtr == *g && 0 < valuesInRow){
+            if( 1 <= valuesInRow && *colPtr == *g){
                 sum += *v;
                 colPtr++;
                 valuesInRow--;
@@ -133,7 +133,7 @@ spmat* spmat_allocate(int n, int nnz){
     sparse->n = n;
     sparse->col = calloc(nnz,sizeof(int));
     checkAllocation(sparse->col, __LINE__,__FILE__);
-    sparse->rowCount = calloc(n+1,sizeof(int));
+    sparse->rowCount = calloc((n+1),sizeof(int));
     checkAllocation(sparse->rowCount, __LINE__,__FILE__);
     return sparse;
 }

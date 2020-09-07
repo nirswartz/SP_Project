@@ -199,11 +199,6 @@ void printAllIntValuesFromFIle(char *location){
 void printFinalGroups(char *location){
     int value,i,j, numOfGroups, numInGroup_i;
     FILE *fInput;
-   /* printf("g is { ");
-    for (i = 0;  i<gLen-1 ; i++) {
-        printf("%d, ", g[i]);
-    }
-    printf("%d }\n", g[i]);*/
     fInput = fopen(location, "r");
     checkOpenFile(fInput, location ,__LINE__,__FILE__ );
     fread(&numOfGroups, sizeof(int), 1, fInput);
@@ -345,7 +340,7 @@ void test7(){
     double *result=calloc(3, sizeof(double));
     myMat = modMat_allocate(f1);
     printB(myMat);
-    update_HatB_f_vector(myMat,g,3);
+    update_HatB_vectors(myMat,g,3);
     mult_HatB(myMat,v,result,g,3);
     printVectorDouble(result,3);
 }
@@ -401,8 +396,21 @@ void test10(){
 
 /* test specific graph on NOVA*/
 void test11(){
-    char *locationInput="inputs\\tester_binary.input";
-    char *locationOutput="outputs\\tester_binary.output";
+    char *locationInput="inputs/graph10000.input";
+    char *locationOutput="outputs/graph10000.output";
+    char *arr[3];
+    arr[0]="sonia and nir are the best!";
+    arr[1]=locationInput;
+    arr[2]=locationOutput;
+    cluster(10,arr);
+    printFinalGroups(locationOutput);
+}
+
+/* test specific graph with valgrid*/
+void test12(){
+    char *locationInput="tester_binary.input";
+    /*char *locationInput="graph20.in";*/
+    char *locationOutput="tester_binary.output";
     char *arr[3];
     arr[0]="sonia and nir are the best!";
     arr[1]=locationInput;

@@ -22,6 +22,12 @@ typedef struct _modMat {
     /*f vector according to the last B^[g]*/
     double *last_f;
 
+    /* temp calculation vector according to the last B^[g] dimension
+     * this vector helps us to decrease allocations in two function:
+     * The first is mult_HatB as tmp vector
+     * The second is max_division as scores vector*/
+    double *calc_double_vector;
+
 } modMat;
 
 /* getter for B(i,j)  */
@@ -37,7 +43,7 @@ double getter_HatB(const modMat *B, int i, int j, int *g, int gLen);
 void mult_HatB(const modMat *B, const double *v, double *result, int *g, int gLen);
 
 /*Calc f vector according to g*/
-void update_HatB_f_vector(modMat *B, int *g, int gLen);
+void update_HatB_vectors(modMat *B, int *g, int gLen);
 
 /*Free all allocations*/
 void free_modMat(modMat *mat);

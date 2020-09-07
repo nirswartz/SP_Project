@@ -54,21 +54,6 @@ int cluster(int argc, char* argv[]){
         g = P->head->data;
         gLen = P->head->size;
 
-        /*printf("g is "); deleteeeeeeeeeeeeeeeeeeee
-        printVectorInt(g,gLen);
-        if(P->len==0){
-            printf("P is empty\n");
-        } else{
-            printf("P is:\n");
-            P->printList(P);
-        }
-        if(O->len==0){
-            printf("O is empty\n");
-        } else {
-            printf("O is:\n");
-            O->printList(P);
-        }*/
-
         delete_first(P,0); /* 0 means deleting the node without freeing its data */
 
         /* Stage 3.2 - Divide g into g1,g2 with Algorithm 2*/
@@ -101,7 +86,7 @@ int cluster(int argc, char* argv[]){
     /* Stage 4 - write the output division to File*/
     write_groups_to_file(O,locationOutput);
 
-    /*delete*/
+    /*TODO - delete*/
     vertexes=(double)B->n;
     argc=argc;
     /*delete*/
@@ -135,7 +120,7 @@ void initialization_of_groups(linkedList *P, int n){
     /*Creating the trivial division of {1,2,...,n}*/
     trivial=(int*)malloc(n * sizeof(int));
     checkAllocation(trivial,__LINE__,__FILE__);
-    for(i=0;i<n;i++){
+    for(i=0; i<n; i++){
         trivial[i] = i;
     }
     insert_first(P,trivial,n); /* P = {{0,...,n-1}}, O = {} */
@@ -175,5 +160,7 @@ void write_groups_to_file(linkedList *O, char *locationOutput){
 /*deleteeeeeeeeeeeeeeeeeee*/
 int main(int argc, char* argv[]){
     test10();
+    argc=argc+0;
+    argv[0]="nir";
     return 0;
 }

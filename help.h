@@ -60,4 +60,7 @@ void test10();
 /* test specific graph on NOVA*/
 void test11();
 
+/* test specific graph with valgrid*/
+void test12();
+
 #endif

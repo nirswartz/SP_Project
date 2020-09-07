@@ -15,35 +15,47 @@ void initialVector(int *vector, int len);
 
 /*Maximize the division from Algorithm 2 like in Algorithm 4*/
 void max_division(modMat *B, double *s, int *g, int gLen) {
-    double deltaQ, score, improve, max_score, max_improve;
-    int *indices, *unmoved, i, k, maxIndexInScore = 0, maxIndexInImprove = 0;
+    double deltaQ, improve, max_score, max_improve, *scores, k_lastIndex_divM;
+    int *indices, *unmoved, i, k, maxIndexInScore = 0, maxIndexInImprove = 0 , last_max_index = 0, *kVector;
+    kVector=B->k;
 
+    /*Create Unmoved, indices and scores*/
     indices = calloc(gLen, sizeof(int));
     checkAllocation(indices, __LINE__, __FILE__);
-
-    /*Create Unmoved*/
     unmoved = malloc(gLen * sizeof(int));
     checkAllocation(unmoved, __LINE__, __FILE__);
+
+    /*Using calc double vector of B instead of allocate new vector*/
+    scores = B->calc_double_vector;
 
     do {
         /*trying to find an improvement of the partition defined by s*/
         initialVector(unmoved,gLen);
-        max_improve=MAX_NEGATIVE_DOUBLE;
+        max_improve = MAX_NEGATIVE_DOUBLE;
         for (i = 0; i < gLen; ++i) {
             /* lines 4 - 10: Computing deltaQ for the move of each unmoved vertex*/
-            max_score=MAX_NEGATIVE_DOUBLE;
+            max_score = MAX_NEGATIVE_DOUBLE;
+            k_lastIndex_divM = kVector[g[last_max_index]] / (double) B->M;
             for (k = 0; k < gLen; ++k) {
                 if (unmoved[k] == 0) {
-                    s[k] *= -1;
-                    score = calc_score(B,s,g,gLen,k);
+                    /*calc the first score based and linear algebra*/
+                    if (i == 0){
+                        s[k] *= -1;
+                        scores[k] = calc_score(B, s, g, gLen, k);
+                        s[k] *= -1;
+                    }
+                    /*calc the score based on the previous calculation and linear algebra*/
+                    else{
+                        scores[k] += (4.0 * ((-s[k]) * (2.0 * s[last_max_index] * (getter_sparse(B->A, g[last_max_index],g[k]) - (kVector[g[k]] * k_lastIndex_divM)))));
+                    }
                     /*compute max{score[j] : j in Unmoved}*/
-                    if (score > max_score) {
-                        max_score = score;
+                    if (scores[k] > max_score) {
+                        max_score = scores[k];
                         maxIndexInScore = k;
                     }
-                    s[k] *= -1;
                 }
             }
+            last_max_index = maxIndexInScore;
 
             /* lines 11 - 20: Moving vertex j' with a maximal score*/
             s[maxIndexInScore] *= -1;
@@ -57,10 +69,12 @@ void max_division(modMat *B, double *s, int *g, int gLen) {
                 maxIndexInImprove = i;
                 max_improve = improve;
             }
+
+            /*mark as moved vertex*/
             unmoved[maxIndexInScore] = 1;
         }
 
-        /* lines 21 - 30: find the maximum improvement of s and update s accordingly*/
+        /* lines 21 - 30: find the maximum improvement of s and update s accordingly */
         for (i = gLen - 1; i > maxIndexInImprove; i--) {
             s[indices[i]] *= -1;
         }
@@ -71,6 +85,8 @@ void max_division(modMat *B, double *s, int *g, int gLen) {
             deltaQ = max_improve;
         }
     } while (IS_POSITIVE(deltaQ));
+
+    /*free all allocations*/
     free(unmoved);
     free(indices);
 }
@@ -86,7 +102,7 @@ double calc_score(modMat *B, double *s, int *g, int gLen, int i){
         Kg_ij = k_i_divM * B->k[g[j]];
         sum+=((Ag_ij-Kg_ij)*s[j]);
     }
-    return (4.0 * ( s[i] * sum + (k_i_divM * B->k[g_i])));
+    return  4.0 * (s[i] * sum + (k_i_divM * B->k[g_i]));
 }
 
 /*Initial Vector with zeros*/
