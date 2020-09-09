@@ -21,9 +21,9 @@ void max_division(modMat *B, double *s, int *g, int gLen) {
 
     /*Create Unmoved, indices and scores*/
     indices = calloc(gLen, sizeof(int));
-    checkAllocation(indices, __LINE__, __FILE__);
+    check_allocation(indices, __LINE__, __FILE__);
     unmoved = malloc(gLen * sizeof(int));
-    checkAllocation(unmoved, __LINE__, __FILE__);
+    check_allocation(unmoved, __LINE__, __FILE__);
 
     /*Using calc double vector of B instead of allocate new vector*/
     scores = B->calc_double_vector;

@@ -129,12 +129,12 @@ double getter_sparse(const spmat *A, int rowNum, int columnNum){
 /* Allocates a new arrays sparse matrix of size n with nnz non-zero elements*/
 spmat* spmat_allocate(int n, int nnz){
     spmat *sparse = malloc(sizeof(spmat));
-    checkAllocation(sparse, __LINE__,__FILE__);
+    check_allocation(sparse, __LINE__,__FILE__);
     sparse->n = n;
     sparse->col = calloc(nnz,sizeof(int));
-    checkAllocation(sparse->col, __LINE__,__FILE__);
+    check_allocation(sparse->col, __LINE__,__FILE__);
     sparse->rowCount = calloc((n+1),sizeof(int));
-    checkAllocation(sparse->rowCount, __LINE__,__FILE__);
+    check_allocation(sparse->rowCount, __LINE__,__FILE__);
     return sparse;
 }
 

@@ -34,11 +34,11 @@ int cluster(int argc, char* argv[]){
 
     /*division[0]=g1, division[1]=g2, division[2]=size(g1), division[3]=size(g2)*/
     division = calloc(4, sizeof(int*));
-    checkAllocation(division,__LINE__,__FILE__);
+    check_allocation(division,__LINE__,__FILE__);
     division[2] = calloc(1, sizeof(int));
-    checkAllocation(division[2],__LINE__,__FILE__);
+    check_allocation(division[2],__LINE__,__FILE__);
     division[3]=calloc(1, sizeof(int));
-    checkAllocation(division[3],__LINE__,__FILE__);
+    check_allocation(division[3],__LINE__,__FILE__);
 
     /*Creating matrix B*/
     B = modMat_allocate(locationInput);
@@ -119,7 +119,7 @@ void initialization_of_groups(linkedList *P, int n){
     int *trivial,i;
     /*Creating the trivial division of {1,2,...,n}*/
     trivial=(int*)malloc(n * sizeof(int));
-    checkAllocation(trivial,__LINE__,__FILE__);
+    check_allocation(trivial,__LINE__,__FILE__);
     for(i=0; i<n; i++){
         trivial[i] = i;
     }
@@ -136,12 +136,12 @@ void write_groups_to_file(linkedList *O, char *locationOutput){
     node *tmp = O->head;
 
     fOutput = fopen(locationOutput,"w");
-    checkOpenFile(fOutput,locationOutput,__LINE__,__FILE__);
+    check_open_file(fOutput,locationOutput,__LINE__,__FILE__);
     len = O->len;
 
     /*Writing number of groups in the division - (n_g) */
     check = fwrite(&len, sizeof(int), 1, fOutput);
-    checkItemsWrite(check,1,__LINE__,__FILE__);
+    check_items_write(check,1,__LINE__,__FILE__);
 
     /*Writing for each group the group's size followed by the group's nodes in increasing order
      (n_g)(n_g1)(g1)(n_g2)(g2)(n_g3)(g3)... */
@@ -149,9 +149,9 @@ void write_groups_to_file(linkedList *O, char *locationOutput){
         group = tmp->data;
         size = tmp->size;
         check = fwrite(&size, sizeof(int), 1, fOutput); /*n_g_i*/
-        checkItemsWrite(check,1,__LINE__,__FILE__);
+        check_items_write(check,1,__LINE__,__FILE__);
         check = fwrite(group, sizeof(int), size, fOutput); /*g_i*/
-        checkItemsWrite(check,size,__LINE__,__FILE__);
+        check_items_write(check,size,__LINE__,__FILE__);
         tmp = tmp->next;
     }
     fclose(fOutput);

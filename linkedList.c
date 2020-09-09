@@ -16,7 +16,7 @@ void printList(linkedList *list); /*deleteeeeee*/
 /*Insert new node to the list at the first place*/
 void insert_first(linkedList *list, int* data, int size){
     node *tmp=(node*)malloc(sizeof(node));
-    checkAllocation(tmp,__LINE__,__FILE__);
+    check_allocation(tmp,__LINE__,__FILE__);
     tmp->data=data;
     tmp->size=size;
     tmp->next=NULL;
@@ -34,7 +34,7 @@ void insert_first(linkedList *list, int* data, int size){
 /*Insert new node to the list at the last place*/
 void insert_last(linkedList *list, int* data, int size){
     node *tmp=(node*)malloc(sizeof(node));
-    checkAllocation(tmp,__LINE__,__FILE__);
+    check_allocation(tmp,__LINE__,__FILE__);
     tmp->data=data;
     tmp->size=size;
     tmp->next=NULL;
@@ -52,7 +52,7 @@ void insert_last(linkedList *list, int* data, int size){
 /*Delete the first node from the list. If contentFlag==1, so the data will be deleted as well*/
 void delete_first(linkedList *list, int contentFlag){
     node *tmp;
-    checkEmptyList(list->len,__LINE__,__FILE__);
+    check_empty_list(list->len,__LINE__,__FILE__);
     tmp=list->head;
     if(list->len==1){
         list->head=NULL;
@@ -86,7 +86,7 @@ void free_linkedList(linkedList *list){
 
 linkedList* linkedList_allocate(){
     linkedList *list = malloc(sizeof(linkedList));
-    checkAllocation(list, __LINE__,__FILE__);
+    check_allocation(list, __LINE__,__FILE__);
     list->len = 0;
     list->head=NULL;
     list->tail=NULL;
@@ -97,7 +97,7 @@ linkedList* linkedList_allocate(){
 void printList(struct _linkedList *list){
     int len,i,j,*val;
     node *tmp;
-    checkEmptyList(list->len,__LINE__,__FILE__);
+    check_empty_list(list->len,__LINE__,__FILE__);
     len=list->len;
     tmp=list->head;
     printf("The list has %d nodes: ",len);

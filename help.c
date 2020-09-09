@@ -51,25 +51,25 @@ spmat* fileToSparseMatrix(char *location) {
 
     /* open files of matrix*/
     fInput = fopen(location, "r");
-    checkOpenFile(fInput, location, __LINE__,__FILE__);
+    check_open_file(fInput, location, __LINE__,__FILE__);
 
     /*initialize matrix with size from the file*/
     n = fread(&vectorSize, sizeof(int), 1, fInput);
-    checkItemsRead(n,1,__LINE__,__FILE__);
+    check_items_read(n,1,__LINE__,__FILE__);
     n = fread(&vectorSize, sizeof(int), 1, fInput);
-    checkItemsRead(n,1,__LINE__,__FILE__);
+    check_items_read(n,1,__LINE__,__FILE__);
     n=checkNNZ(fInput, vectorSize);
     matrix=spmat_allocate(vectorSize, n);
 
     /*initialize row and*/
     matrixRow = calloc(vectorSize,sizeof(double));
-    checkAllocation(matrixRow,__LINE__,__FILE__);
+    check_allocation(matrixRow,__LINE__,__FILE__);
 
     /*Read matrix row from file and add to sprase matrix*/
     for(i = 0; i < vectorSize; ++i){
         /*read line in cov matrix*/
         n=fread(matrixRow, sizeof(double), vectorSize, fInput);
-        checkItemsRead(n,vectorSize,__LINE__,__FILE__);
+        check_items_read(n,vectorSize,__LINE__,__FILE__);
         /*add_row_sparse(matrix,matrixRow,i);*/
     }
     fclose(fInput);
@@ -85,11 +85,11 @@ void calcEigenVectorAndWrite(spmat *matrix, char *location){
     int flag=1,n;
 
     fOutput = fopen(location, "w");
-    checkOpenFile(fOutput, location ,__LINE__,__FILE__ );
+    check_open_file(fOutput, location ,__LINE__,__FILE__ );
 
     /*initialize row and*/
     eigenVector = calloc(matrix->n,sizeof(double));
-    checkAllocation(eigenVector,__LINE__,__FILE__);
+    check_allocation(eigenVector,__LINE__,__FILE__);
 
     /*calc eigen with power iteration*/
     /*powerIteration(matrix,eigenVector);*/
@@ -115,24 +115,24 @@ void printFileMatrix(char *location){
 
     /* open files of matrix*/
     fInput = fopen(location, "r");
-    checkOpenFile(fInput, location, __LINE__,__FILE__);
+    check_open_file(fInput, location, __LINE__,__FILE__);
 
     /*initialize row and*/
     matrixRow = calloc(VectorWid,sizeof(double));
-    checkAllocation(matrixRow,__LINE__,__FILE__);
+    check_allocation(matrixRow,__LINE__,__FILE__);
 
     /*initialize matrix with size from the file*/
     n = fread(&vectorLen, sizeof(int), 1, fInput);
-    checkItemsRead(n,1,__LINE__,__FILE__);
+    check_items_read(n,1,__LINE__,__FILE__);
     n = fread(&VectorWid, sizeof(int), 1, fInput);
-    checkItemsRead(n,1,__LINE__,__FILE__);
+    check_items_read(n,1,__LINE__,__FILE__);
     printf("The matrix is %d x %d\n",vectorLen,VectorWid);
 
     /*Read matrix row from file and add to sprase matrix*/
     for(i = 0; i < vectorLen; ++i){
         /*read line in cov matrix*/
         n=fread(matrixRow, sizeof(double), VectorWid, fInput);
-        checkItemsRead(n,VectorWid,__LINE__,__FILE__);
+        check_items_read(n,VectorWid,__LINE__,__FILE__);
         printf(" %f ,", matrixRow[0]);
         for(j = 1; j < VectorWid-1; ++j){
             printf(" %f ,", matrixRow[j]);
@@ -150,7 +150,7 @@ void createMatrixFile(int *values,int n, int m, char *location){
     int check,i;
 
     fOutput = fopen(location, "w");
-    checkOpenFile(fOutput, location ,__LINE__,__FILE__ );
+    check_open_file(fOutput, location ,__LINE__,__FILE__ );
 
     /* check =fwrite(&m, sizeof(int), 1, fOutput);
      assert(check==1);
@@ -186,7 +186,7 @@ void printAllIntValuesFromFIle(char *location){
     int value,i=0;
     FILE *fInput;
     fInput = fopen(location, "r");
-    checkOpenFile(fInput, location ,__LINE__,__FILE__ );
+    check_open_file(fInput, location ,__LINE__,__FILE__ );
     while(!feof(fInput)){
         fread(&value, sizeof(int), 1, fInput);
         printf("%d (i=%d), ",value,i);
@@ -200,7 +200,7 @@ void printFinalGroups(char *location){
     int value,i,j, numOfGroups, numInGroup_i;
     FILE *fInput;
     fInput = fopen(location, "r");
-    checkOpenFile(fInput, location ,__LINE__,__FILE__ );
+    check_open_file(fInput, location ,__LINE__,__FILE__ );
     fread(&numOfGroups, sizeof(int), 1, fInput);
     printf("There is %d groups in division\n",numOfGroups);
     for (i = 0;  i< numOfGroups; i++) {
@@ -362,11 +362,11 @@ void test9(){
     printB(B);*/
     eigen=calloc(B->n, sizeof(double));
     division = calloc(4, sizeof(int*));
-    checkAllocation(division,__LINE__,__FILE__);
+    check_allocation(division,__LINE__,__FILE__);
     division[2] = calloc(1, sizeof(int));
-    checkAllocation(division[2],__LINE__,__FILE__);
+    check_allocation(division[2],__LINE__,__FILE__);
     division[3]=calloc(1, sizeof(int));
-    checkAllocation(division[3],__LINE__,__FILE__);
+    check_allocation(division[3],__LINE__,__FILE__);
     /*calcTwoDivision(B,division,g,20);
     printf("g:\n");
     printVectorInt(g,20);

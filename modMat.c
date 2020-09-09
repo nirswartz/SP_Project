@@ -120,10 +120,10 @@ void update_HatB_vectors(modMat *B, int *g, int gLen){
         free(B->calc_double_vector);
     }
     B->last_f = calloc(gLen,sizeof(double));
-    checkAllocation(B->last_f, __LINE__, __FILE__);
+    check_allocation(B->last_f, __LINE__, __FILE__);
     calc_f_vector(B, B->last_f, g, gLen);
     B->calc_double_vector = calloc(gLen,sizeof(double));
-    checkAllocation(B->calc_double_vector, __LINE__, __FILE__);
+    check_allocation(B->calc_double_vector, __LINE__, __FILE__);
 }
 
 /*Free all allocations*/
@@ -144,7 +144,7 @@ modMat* modMat_allocate(char *location){
     /* assign memory */
     modMat *mat;
     mat = calloc(1,sizeof(modMat));
-    checkAllocation(mat, __LINE__,__FILE__);
+    check_allocation(mat, __LINE__,__FILE__);
 
     /* load all data from input file: n(number of nodes), k vector, M(nnz) and create sparse matrix of A*/
     load_data_from_input_file(mat,location);
@@ -176,36 +176,39 @@ void load_data_from_input_file(modMat *B, char *location){
     FILE *fInput;
 
     fInput = fopen(location,"r");
-    checkOpenFile(fInput, location, __LINE__, __FILE__);
+    check_open_file(fInput, location, __LINE__, __FILE__);
 
     /*initialize the matrix with size (n) from the file */
     check = fread(&(B->n),sizeof(int), 1, fInput);
-    checkItemsRead(check,1,__LINE__,__FILE__);
+    check_items_read(check,1,__LINE__,__FILE__);
+    check_empty_graph(B->n, __LINE__, __FILE__);
 
     /* create vector k and calculate M */
     B->k = (int*) calloc(B->n,sizeof(int));
-    checkAllocation(B->k, __LINE__, __FILE__);
+    check_allocation(B->k, __LINE__, __FILE__);
     kVector = B->k;
 
     /*calc NNZ*/
     stat(location, &info);
     B->M = (info.st_size/sizeof(int)) - (B->n+1);
+    /*If There are no edges, all divisions are legit */
+    check_no_edges(B->M,__LINE__,__FILE__);
 
     /*Initialization of sparse matrix and data vectors*/
     indices = calloc(B->n,sizeof(int));
-    checkAllocation(indices,__LINE__,__FILE__);
+    check_allocation(indices,__LINE__,__FILE__);
     B->A = spmat_allocate(B->n, B->M);
 
     for(i = 0; i < B->n ; ++i){
         /*read k_i from file*/
         check = fread(&k_i, sizeof(int), 1, fInput);
-        checkItemsRead(check, 1, __LINE__,__FILE__);
+        check_items_read(check, 1, __LINE__,__FILE__);
         *kVector = k_i;
         kVector++;
 
         /*Read the k_i vertexes from file*/
         check = fread(indices, sizeof(int), k_i, fInput);
-        checkItemsRead(check,k_i,__LINE__,__FILE__);
+        check_items_read(check,k_i,__LINE__,__FILE__);
 
         /*Add indices row to sparse matrix A*/
         add_row_sparse(B->A,indices,k_i,i);

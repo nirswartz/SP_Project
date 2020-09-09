@@ -24,12 +24,12 @@ void power_iteration(modMat *B, double *vector, int *g, int gLen)
 
     /*initialize arr for eigenvector*/
     b = calloc(gLen,sizeof(double));
-    checkAllocation(b, __LINE__,__FILE__);
+    check_allocation(b, __LINE__,__FILE__);
     initialization(b, gLen);
 
     /*initialize new eigenvector*/
     bNew = calloc(gLen,sizeof(double));
-    checkAllocation(bNew, __LINE__,__FILE__);
+    check_allocation(bNew, __LINE__,__FILE__);
 
     /*start iterations - if difference bigger than epsilon continue, else stop iterating*/
     while(flag == 1)
@@ -84,7 +84,7 @@ void initialization(double *arr, int rowLength){
 void normalized(double *arr, int rowLength) {
     int i;
     double norm = sqrt(dot_product(arr,arr,rowLength));
-    checkDivideByZero(norm, __LINE__,__FILE__);
+    check_divide_by_zero(norm, __LINE__,__FILE__);
     for (i = 0; i < rowLength; i++) {
         *arr = (double) *arr / norm;
         arr++;

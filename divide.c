@@ -26,7 +26,7 @@ void calc_two_division(modMat *B, int **division, int *g, int gLen){
     int i;
 
     eigenvector = calloc(gLen, sizeof(double));
-    checkAllocation(eigenvector, __LINE__,__FILE__);
+    check_allocation(eigenvector, __LINE__,__FILE__);
 
     /*Update f vector of new B^[g] before multiplication in power iteration*/
     update_HatB_vectors(B,g,gLen);
@@ -39,7 +39,7 @@ void calc_two_division(modMat *B, int **division, int *g, int gLen){
      deleteeeeeeeeeeeeeeeeee*/
 
     s = calloc(gLen, sizeof(double));
-    checkAllocation(s, __LINE__,__FILE__);
+    check_allocation(s, __LINE__,__FILE__);
     sStart = s;
 
     if(IS_POSITIVE(lambda)){
@@ -105,15 +105,15 @@ void create_s(double *eigenvector, double *s, int vectorSize){
 double compute_eigen_value(modMat *B ,double *eigenvector, int *g, int gLen){
     double *v, dot1, dot2;
     v = calloc(gLen, sizeof(double));
-    checkAllocation(v, __LINE__,__FILE__);
+    check_allocation(v, __LINE__,__FILE__);
     /* compute B_hat[g]*eigenvector */
     mult_HatB(B, eigenvector,v, g, gLen);
     /* compute (eigenvector^T * B_hat[g]*eigenvector) */
     dot1 = dot_product(eigenvector,v,gLen);
     /* compute (eigenvector^T * eigenvector) */
     dot2 = dot_product(eigenvector,eigenvector,gLen);
-    checkDivideByZero(dot2, __LINE__,__FILE__);
     free(v);
+    check_divide_by_zero(dot2, __LINE__,__FILE__);
     return (dot1 / dot2);
 }
 
@@ -143,7 +143,7 @@ double computeModularity(modMat *B, double *s, int *g, int gLen){
 void g_is_indivisible(int **division, int *g, int gLen){
     division[0] = g;
     division[1] = calloc(1, sizeof(int));
-    checkAllocation(division[1],__LINE__,__FILE__);
+    check_allocation(division[1],__LINE__,__FILE__);
     *division[2] = gLen;
     *division[3] = 0;
 }
@@ -157,9 +157,9 @@ void make_division(int **division, double *s, int *g, int gLen, int numOfPositiv
         return;
     }
     g1 = calloc(numOfPositive, sizeof(int));
-    checkAllocation(g1, __LINE__,__FILE__);
+    check_allocation(g1, __LINE__,__FILE__);
     g2 = calloc((gLen-numOfPositive), sizeof(int));
-    checkAllocation(g2, __LINE__,__FILE__);
+    check_allocation(g2, __LINE__,__FILE__);
 
     gStart = g;
     p1 = g1;
