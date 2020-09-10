@@ -374,7 +374,7 @@ void test9(){
     printVectorInt(division[0],*division[2]);
     printf("g2:\n");
     printVectorInt(division[1],*division[3]);*/
-    calc_two_division(B,division,g1,13);
+    /*calc_two_division(B,my,g1,13);*/
     printf("g1 divided:\n");
     printf("g1:\n");
     printVectorInt(division[0],*division[2]);

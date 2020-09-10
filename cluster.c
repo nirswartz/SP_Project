@@ -20,9 +20,10 @@ void write_groups_to_file(linkedList *O, char *locationOutput);
 /* The main algorithm which calculating the clusters according to Algorithm 3*/
 int cluster(int argc, char* argv[]){
     char *locationInput, *locationOutput;
-    int *g,*g1,*g2, gLen, size_g1, size_g2, **division;
+    int *g,*g1,*g2, gLen, size_g1, size_g2;
     linkedList *O, *P;
     modMat *B;
+    division *my_division;
 
     /*timing - deleteeeeeeeeeeeeeeeeeeeeeee*/
     clock_t t;
@@ -32,13 +33,8 @@ int cluster(int argc, char* argv[]){
     locationInput = argv[1];
     locationOutput = argv[2];
 
-    /*division[0]=g1, division[1]=g2, division[2]=size(g1), division[3]=size(g2)*/
-    division = calloc(4, sizeof(int*));
-    check_allocation(division,__LINE__,__FILE__);
-    division[2] = calloc(1, sizeof(int));
-    check_allocation(division[2],__LINE__,__FILE__);
-    division[3]=calloc(1, sizeof(int));
-    check_allocation(division[3],__LINE__,__FILE__);
+    /* Creating division*/
+     my_division = division_allocate();
 
     /*Creating matrix B*/
     B = modMat_allocate(locationInput);
@@ -57,16 +53,16 @@ int cluster(int argc, char* argv[]){
         delete_first(P,0); /* 0 means deleting the node without freeing its data */
 
         /* Stage 3.2 - Divide g into g1,g2 with Algorithm 2*/
-        calc_two_division(B,division,g,gLen);
-        g1 = division[0];
-        g2 = division[1];
-        size_g1 = *division[2];
-        size_g2 = *division[3];
+        calc_two_division(B,my_division,g,gLen);
+        g1 = my_division->g1;
+        g2 = my_division->g2;
+        size_g1 = my_division->g1_size;
+        size_g2 = my_division->g2_size;
 
         /* Stage 3.3 - check if g1 or g2 is of size 0*/
         if(size_g1 == 0 || size_g2 == 0){
             insert_last(O,g,gLen);
-            free(g2); /*free garbage cell*/
+            /*free(g2); TODO:free garbage cell*/
         }
         else {
             /* Stage 3.4 - add groups to P or O*/
@@ -96,12 +92,11 @@ int cluster(int argc, char* argv[]){
     free(B);
 
     /*free division*/
-    free(division[2]);
-    free(division[3]);
-    free(division);
+    /* TODO: no need to use free_division(my_division), because the free happens on free_linkedList*/
+    free(my_division);
 
     /*free linkedList*/
-    free_linkedList(P);
+    /* TODO: no need to use free_linkedList(P), because P is empty here like described in Algorithm 3*/
     free_linkedList(O);
     free(P);
     free(O);

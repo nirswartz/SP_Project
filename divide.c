@@ -9,19 +9,42 @@
 #define IS_POSITIVE(X)((X)>0.00001)
 
 /* functions deceleration */
-void calc_two_division(modMat *B, int **division, int *g, int gLen);
+division* division_allocate();
+void free_division(division *my_division);
+void calc_two_division(modMat *B, division *my_division, int *g, int gLen);
 double compute_modularity(modMat *B, double *s, int *g, int gLen);
 void create_s(double *eigenvector, double *s, int vectorSize);
 double compute_eigen_value(modMat *B ,double *eigenvector, int *g, int gLen);
-void g_is_indivisible(int **division, int *g, int gLen);
-void make_division(int **division, double *s, int *g, int gLen, int numOfPositive);
+void g_is_indivisible(division *my_division, int *g, int gLen);
+void make_division(division *my_division, double *s, int *g, int gLen, int numOfPositive);
 int count_positive_values(double *vector,int vectorSize);
 /* end of functions deceleration */
 
+/* Allocates a new division*/
+division* division_allocate(){
+    division *my_division = malloc(sizeof(division));
+    check_allocation(my_division, __LINE__,__FILE__);
+    my_division->g1 = NULL;
+    my_division->g2 = NULL;
+    my_division->g1_size = 0;
+    my_division->g2_size = 0;
+    return my_division;
+}
+
+/* Frees all resources used by division */
+void free_division(division *my_division){
+    if(my_division->g1 != NULL){
+        free(my_division->g1);
+    }
+    if(my_division->g2 != NULL){
+        free(my_division->g2);
+    }
+}
+
+
 /* Divide a group g into two groups g1,g2 like in Algorithm 2
- * The result is an array division[4] where division[0]=g1 and division[1]=g2
- * division[2]=size(g1) and division[3]=size(g2)*/
-void calc_two_division(modMat *B, int **division, int *g, int gLen){
+ * The result is a division struct with the data of g1, g2, size of g1, size of g2*/
+void calc_two_division(modMat *B, division *my_division, int *g, int gLen){
     double *eigenvector, *s, lambda, Q, *sStart;
     int i;
 
@@ -62,13 +85,13 @@ void calc_two_division(modMat *B, int **division, int *g, int gLen){
         Q = compute_modularity(B, s, g, gLen);
         if (IS_POSITIVE(Q)){
             /* divide s into g_1 and g_2 */
-            make_division(division,s,g,gLen,count_positive_values(s,gLen));
+            make_division(my_division,s,g,gLen,count_positive_values(s,gLen));
             free(eigenvector);
             free(s);
             return;
         }
     }
-    g_is_indivisible(division, g, gLen);
+    g_is_indivisible(my_division, g, gLen);
     free(eigenvector);
     free(s);
 }
@@ -138,22 +161,26 @@ double computeModularity(modMat *B, double *s, int *g, int gLen){
 	return sum;
 }*/
 
-/* g is indivisible, return g in division[0]
- * and an empty group in division[2] */
-void g_is_indivisible(int **division, int *g, int gLen){
-    division[0] = g;
+/* g is indivisible, return g in my_divistion->g1
+ * and an empty group in my_divistion->g2 */
+void g_is_indivisible(division *my_division, int *g, int gLen){
+    my_division->g1 = g;
+    my_division->g2 = NULL;
+    my_division->g1_size = gLen;
+    my_division->g2_size = 0;
+    /*TODO: division[0] = g;
     division[1] = calloc(1, sizeof(int));
     check_allocation(division[1],__LINE__,__FILE__);
     *division[2] = gLen;
-    *division[3] = 0;
+    *division[3] = 0;*/
 }
 
-/*Divide the vertices in g into two groups g1,g2 according to s where division[0]=g1 and division[1]=g2
- *division[2]=size(g1) and division[3]=size(g2)*/
-void make_division(int **division, double *s, int *g, int gLen, int numOfPositive){
-    int *g1 , *g2, *p1, *p2, i, *gStart;
+/*Divide the vertices in g into two groups g1,g2 according to s
+ * The function insert the data of g1, g2, size of g1, size of g2 into my_division*/
+void make_division(division *my_division, double *s, int *g, int gLen, int numOfPositive){
+    int *g1 , *g2, *g1_start, *g2_start, i, *g_start;
     if(numOfPositive == gLen || numOfPositive == 0){
-        g_is_indivisible(division, g, gLen);
+        g_is_indivisible(my_division, g, gLen);
         return;
     }
     g1 = calloc(numOfPositive, sizeof(int));
@@ -161,9 +188,9 @@ void make_division(int **division, double *s, int *g, int gLen, int numOfPositiv
     g2 = calloc((gLen-numOfPositive), sizeof(int));
     check_allocation(g2, __LINE__,__FILE__);
 
-    gStart = g;
-    p1 = g1;
-    p2 = g2;
+    g_start = g;
+    g1_start = g1;
+    g2_start = g2;
     for (i = 0; i < gLen; ++i) {
         if(*s == 1.0){
             *g1 = *g;
@@ -176,11 +203,11 @@ void make_division(int **division, double *s, int *g, int gLen, int numOfPositiv
         g++;
         s++;
     }
-    division[0] = p1;
-    division[1] = p2;
-    *division[2] = numOfPositive;
-    *division[3] = (gLen-numOfPositive);
-    g = gStart;
+    my_division->g1 = g1_start;
+    my_division->g2 = g2_start;
+    my_division->g1_size = numOfPositive;
+    my_division->g2_size = (gLen-numOfPositive);
+    g = g_start;
     free(g);
 }
 
@@ -195,4 +222,3 @@ int count_positive_values(double *vector,int vectorSize){
     }
     return counter;
 }
-
