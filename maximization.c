@@ -15,9 +15,8 @@ void initialVector(int *vector, int len);
 
 /*Maximize the division from Algorithm 2 like in Algorithm 4*/
 void max_division(modMat *B, double *s, int *g, int gLen) {
-    double deltaQ, improve, max_score, max_improve, *scores, k_lastIndex_divM;
-    int *indices, *unmoved, i, k, maxIndexInScore = 0, maxIndexInImprove = 0 , last_max_index = 0, *kVector;
-    kVector=B->k;
+    double deltaQ, improve, max_score, max_improve, *scores;
+    int *indices, *unmoved, i, k, maxIndexInScore = 0, maxIndexInImprove = 0 , last_max_index = 0;
 
     /*Create Unmoved, indices and scores*/
     indices = calloc(gLen, sizeof(int));
@@ -35,7 +34,6 @@ void max_division(modMat *B, double *s, int *g, int gLen) {
         for (i = 0; i < gLen; ++i) {
             /* lines 4 - 10: Computing deltaQ for the move of each unmoved vertex*/
             max_score = MAX_NEGATIVE_DOUBLE;
-            k_lastIndex_divM = kVector[g[last_max_index]] / (double) B->M;
             for (k = 0; k < gLen; ++k) {
                 if (unmoved[k] == 0) {
                     /*calc the first score based and linear algebra*/
@@ -46,7 +44,8 @@ void max_division(modMat *B, double *s, int *g, int gLen) {
                     }
                     /*calc the score based on the previous calculation and linear algebra*/
                     else{
-                        scores[k] += (4.0 * ((-s[k]) * (2.0 * s[last_max_index] * (getter_sparse(B->A, g[last_max_index],g[k]) - (kVector[g[k]] * k_lastIndex_divM)))));
+                        scores[k] -= (8.0 * s[k] * s[last_max_index] * getter_B(B,g[last_max_index],g[k]));
+                        /*TODO: change to 4 here and 2 in calc score??????*/
                     }
                     /*compute max{score[j] : j in Unmoved}*/
                     if (scores[k] > max_score) {
@@ -93,16 +92,13 @@ void max_division(modMat *B, double *s, int *g, int gLen) {
 
 /*Calc the score after moving s[k]=-s[k] according to linear algebra calculation*/
 double calc_score(modMat *B, double *s, int *g, int gLen, int i){
-    double sum = 0, Ag_ij, Kg_ij, k_i_divM;
+    double sum = 0;/* Ag_ij, Kg_ij, k_i_divM;*/
     int j, g_i;
     g_i = g[i];
-    k_i_divM=B->k[g_i] / (double)B->M;
     for (j = 0; j <gLen ; ++j) {
-        Ag_ij = getter_sparse(B->A,g_i,g[j]);
-        Kg_ij = k_i_divM * B->k[g[j]];
-        sum+=((Ag_ij-Kg_ij)*s[j]);
+        sum += (getter_B(B, g_i, g[j]) * s[j]);
     }
-    return  4.0 * (s[i] * sum + (k_i_divM * B->k[g_i]));
+    return  4.0 * (s[i] * sum + ((B->k[g_i] * B->k[g_i]) / (double)B->M));
 }
 
 /*Initial Vector with zeros*/
