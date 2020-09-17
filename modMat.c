@@ -6,19 +6,14 @@
 #include "spmat.h"
 #include "errors.h"
 
-
 /*function declaration*/
+modMat* modMat_allocate(char *location);
 double getter_B(const modMat *B, int i, int j);
-double getter_HatB(const modMat *B, int i, int j, int *g, int gLen);
 void mult_HatB(const modMat *B, const double *v, double *result, int *g, int gLen);
-/*void multB_hat_noShift(const struct _modMat *B, const double *v, double *result, int *g, int gLen)*/ /*deleteeeeeeeeeeee*/
 void update_HatB_vectors(modMat *B, int *g, int gLen);
 void free_modMat(modMat *mat);
-modMat* modMat_allocate(char *location);
-/*void updated_vector_by_indices_with_value(double *vector,int *indices, int indicesLen, double value);*/
 void load_data_from_input_file(modMat *B, char *location);
 void calc_f_vector(const modMat *B, double *f, int *g, int gLen);
-/*double calc_norm(const modMat *B,  double *f, int *g, int gLen);*/ /*deleteeeeeee*/
 double calc_norm(modMat *B);
 void vector_addition(double *res, double *v, int vectorLen);
 void vector_subtraction(double *res, double *v, int vectorLen);
@@ -26,10 +21,28 @@ void vector_mult(const double *v0, const double *v1, double *res, int vectorLen)
 double dot_product_by_g(const int* row1,const double* row2,int *g, int gLen);
 void vector_scalar_mult_by_g(const int *v, double scalar, double *res, int *g,int gLen);
 void vector_scalar_mult(const double *v, double scalar, double *res,int gLen);
-void printA(modMat *B); /*deleteeeeee*/
-void printB(modMat *B);/*deleteeeeeeee*/
-/*void printHatB(modMat *HatB);*/ /*delteeeeeeeeeee*/
 /*end of functions declaration*/
+
+
+/* Allocates new modularity matrix from input file */
+modMat* modMat_allocate(char *location){
+    /* assign memory */
+    modMat *mat;
+    mat = calloc(1,sizeof(modMat));
+    check_allocation(mat, __LINE__,__FILE__);
+
+    /* load all data from input file: n(number of nodes), k vector, M(nnz) and create sparse matrix of A*/
+    load_data_from_input_file(mat,location);
+
+    /*initialize norm of B */
+    mat->norm = calc_norm(mat);
+
+    /*initialize f vector and calc vector*/
+    mat->last_f = NULL;
+    mat->calc_double_vector = NULL;
+
+    return mat;
+}
 
 /* getter for B(i,j) when i is the row and j is the column */
 double getter_B(const modMat *B, int i, int j){
@@ -137,26 +150,6 @@ void free_modMat(modMat *mat){
     if(mat->calc_double_vector != NULL){
         free(mat->calc_double_vector);
     }
-}
-
-/* Allocates new modularity matrix from input file */
-modMat* modMat_allocate(char *location){
-    /* assign memory */
-    modMat *mat;
-    mat = calloc(1,sizeof(modMat));
-    check_allocation(mat, __LINE__,__FILE__);
-
-    /* load all data from input file: n(number of nodes), k vector, M(nnz) and create sparse matrix of A*/
-    load_data_from_input_file(mat,location);
-
-    /*initialize norm of B */
-    mat->norm = calc_norm(mat);
-
-    /*initialize f vector and calc vector*/
-    mat->last_f = NULL;
-    mat->calc_double_vector = NULL;
-
-    return mat;
 }
 
 /*update the vector's values in specific indexes to the same value*/

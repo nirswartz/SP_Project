@@ -10,7 +10,6 @@ void check_open_file(void *open, char *fileName, int rowNum, char *programName);
 void check_empty_list(int len, int rowNum, char *programName);
 void check_empty_graph(int size, int rowNum, char *programName);
 void check_no_edges(int edgeNum, int rowNum, char *programName);
-/*void check_getter_out_of_boundary(int i, int j, int n, int rowNum, char *programName);*/
 /* end of functions deceleration */
 
 void check_allocation(void* pointer, int rowNum, char *programName){
@@ -71,11 +70,3 @@ void check_no_edges(int edgeNum, int rowNum, char *programName){
         exit(80);
     }
 }
-
-/* checks if getter(i,j) is out of boundary for symmetric matrix n X n - Exit code 90*/
-/*TODO: void check_getter_out_of_boundary(int i, int j, int n, int rowNum, char *programName){
-    if(i > n || j > n || i < 0 || j < 0){
-        printf("Out of boundary request for matrix %d X %d in line: %d in program: %s\n",n,rowNum, programName);
-        exit(80);
-    }
-}*/

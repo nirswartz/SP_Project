@@ -25,7 +25,4 @@ void check_empty_graph(int size, int rowNum, char *programName);
 /* checks if the graph has no edges, so every division is legit - Exit code 80*/
 void check_no_edges(int edgeNum, int rowNum, char *programName);
 
-/* checks if getter(i,j) is out of boundary for matrix n X n - Exit code 90*/
-/* TODO: void check_getter_out_of_boundary(int i, int j, int n, int rowNum, char *programName);*/
-
 #endif
