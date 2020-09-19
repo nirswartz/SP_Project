@@ -76,8 +76,7 @@ void initialization(double *arr, int rowLength){
     int i;
     srand(time(0));
     for(i = 0; i < rowLength; ++i){
-        /* *(arr)=rand();*/
-        *(arr)=i;
+        *arr=rand();
         arr++;
     }
 }

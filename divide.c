@@ -65,6 +65,7 @@ void calc_two_division(modMat *B, division *my_division, int *g, int gLen){
     if(IS_POSITIVE(lambda)){
         /* compute s */
         create_s(eigenvector, s, gLen);
+        
         /*compute s^T*B_hat[g]*s */
         Q = compute_modularity(B, s, g, gLen);
 
@@ -78,6 +79,7 @@ void calc_two_division(modMat *B, division *my_division, int *g, int gLen){
         }
         /*Maximize modularity of division of vector s*/
         max_division(B, s, g, gLen);
+
         /*compute s^T*B_hat[g]*s */
         Q = compute_modularity(B, s, g, gLen);
         if (IS_POSITIVE(Q)){
@@ -100,7 +102,7 @@ double compute_modularity(modMat *B, double *s, int *g, int gLen){
     for(i=0; i<gLen; i++){
         for (j = 0; j <gLen ; ++j) {
             if(s[i]!=s[j]){
-                sum-=(getter_B(B,g[i],g[j]));
+                sum -= (getter_B(B,g[i],g[j]));
             }
         }
     }
@@ -126,12 +128,16 @@ double compute_eigen_value(modMat *B ,double *eigenvector, int *g, int gLen){
     double *v, dot1, dot2;
     v = calloc(gLen, sizeof(double));
     check_allocation(v, __LINE__,__FILE__);
+
     /* compute B_hat[g]*eigenvector */
     mult_HatB(B, eigenvector,v, g, gLen);
+
     /* compute (eigenvector^T * B_hat[g]*eigenvector) */
     dot1 = dot_product(eigenvector,v,gLen);
+
     /* compute (eigenvector^T * eigenvector) */
     dot2 = dot_product(eigenvector,eigenvector,gLen);
+
     free(v);
     check_divide_by_zero(dot2, __LINE__,__FILE__);
     return (dot1 / dot2);
