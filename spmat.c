@@ -5,7 +5,7 @@
 
 /* This class implements a sparse matrix with arrays representation,
  * All values in our project are 0 or 1, so values array is useless.
-* for each row, the columns indexes are in increasing order*/
+* for each row, the columns indexes are in increasing order */
 
 /* functions deceleration */
 spmat* spmat_allocate(int n, int nnz);
