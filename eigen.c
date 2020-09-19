@@ -19,9 +19,8 @@ int big_difference(double *b, double* bNew, int rowLength);
 /*calculating dominant eigen vector of B^[g], result will be placed in vector */
 void power_iteration(modMat *B, double *vector, int *g, int gLen)
 {
-    int	flag = 1, i;
+    int	flag = 1, i, total_iterations = 0;
     double  *b, *bNew, *tmp;
-
     /*initialize arr for eigenvector*/
     b = calloc(gLen,sizeof(double));
     check_allocation(b, __LINE__,__FILE__);
@@ -42,6 +41,8 @@ void power_iteration(modMat *B, double *vector, int *g, int gLen)
         tmp = b;
         b = bNew;
         bNew = tmp;
+        total_iterations++;
+        check_infinite_loop(total_iterations, B->upper_bound, __LINE__, __FILE__);
     }
 
     /* copy eigenvector with greatest eigenvalue into output vector */
@@ -75,7 +76,8 @@ void initialization(double *arr, int rowLength){
     int i;
     srand(time(0));
     for(i = 0; i < rowLength; ++i){
-        *(arr)=rand();
+        /* *(arr)=rand();*/
+        *(arr)=i;
         arr++;
     }
 }

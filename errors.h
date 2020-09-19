@@ -25,4 +25,7 @@ void check_empty_graph(int size, int rowNum, char *programName);
 /* checks if the graph has no edges, so every division is legit - Exit code 80*/
 void check_no_edges(int edgeNum, int rowNum, char *programName);
 
+/* checks if number of iterations is beyond expected which is like infinite loop - Exit code 90*/
+void check_infinite_loop(int totalIters, int upperBound, int rowNum, char *programName);
+
 #endif

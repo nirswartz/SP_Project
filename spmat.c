@@ -11,7 +11,7 @@
 spmat* spmat_allocate(int n, int nnz);
 void add_row_sparse(spmat *A, int *indices, int indicesLen, int rowNum);
 void free_sparse(spmat *A);
-void mult_sparse(const spmat *A, const double *v, double *result, int *g, int gLen);
+void mult_sparse(const spmat *A, const double *v, double *result);
 double getter_sparse(const spmat *A, int i, int j);
 /*end of functions declaration*/
 
@@ -46,38 +46,24 @@ void free_sparse(spmat *A){
     free(A->rowCount);
 }
 
- /* Multiplies matrix A[g] by vector v, into result (result is pre-allocated)
- * g is a group with glen indices which define A[g]
- * len(v) = len(result) = dim(A[g]) = gLen*/
-void mult_sparse(const spmat *A, const double *v, double *result, int *g, int gLen){
-    int *colPtr, valuesInRow, i ,j, *skipValues, *gStart;
+/* Multiplies matrix A[g] by vector v, into result (result is pre-allocated)
+ * A[g] is created according to g before calling this function
+ * len(v) = len(result) = dim(A[g])*/
+void mult_sparse(const spmat *A, const double *v, double *result){
+    int *p1 = A->rowCount, i, j, *colPtr = A->col;
+    int *p2 = (A->rowCount)+1;
     double sum;
-    const double *vStart;
-    gStart = g;
-    vStart = v;
-
-    for(i = 0; i < gLen; ++i){
-        skipValues = A->rowCount + g[i];
-        colPtr = A->col + *skipValues;
-        valuesInRow= *(skipValues+1) - *skipValues;
-        sum = 0;
-        for (j = 0; j < gLen && 0 < valuesInRow ; ++j) {
-            while( 1 <= valuesInRow && *colPtr < *g){
-                colPtr++;
-                valuesInRow--;
-            }
-            if( 1 <= valuesInRow && *colPtr == *g){
-                sum += *v;
-                colPtr++;
-                valuesInRow--;
-            }
-            g++;
-            v++;
+    for (i = 0; i < (A->n); ++i) {
+        sum=0;
+        for (j = 0; j < ((*p2) - (*p1)); ++j) {
+            /* No need for multiplication because all values are 1.0*/
+            sum += *(v + *colPtr);
+            colPtr++;
         }
-        g = gStart;
-        v = vStart;
         *result = sum;
         result++;
+        p1++;
+        p2++;
     }
 }
 

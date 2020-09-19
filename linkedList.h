@@ -28,7 +28,4 @@ void free_linkedList(linkedList *list);
 /*Allocates a new linkedList*/
 linkedList* linkedList_allocate();
 
-/*Print the list - deleteeeeee*/
-void printList(linkedList *list);
-
 #endif

@@ -57,9 +57,6 @@ void calc_two_division(modMat *B, division *my_division, int *g, int gLen){
     /* compute leading eigenvector */
     power_iteration(B, eigenvector, g, gLen);
     lambda = compute_eigen_value(B,eigenvector,g,gLen) - (B->norm);
-    /*printVectorDouble(eigenvector,gLen);
-    printf("lambda is %f\n",lambda);
-     deleteeeeeeeeeeeeeeeeee*/
 
     s = calloc(gLen, sizeof(double));
     check_allocation(s, __LINE__,__FILE__);
@@ -139,27 +136,6 @@ double compute_eigen_value(modMat *B ,double *eigenvector, int *g, int gLen){
     check_divide_by_zero(dot2, __LINE__,__FILE__);
     return (dot1 / dot2);
 }
-
-/*deleteeeeeeeeeeeeeeeee*/
-/*compute modularity Q = s^T*B^[g]*s according to linear algebra
-double computeModularity(modMat *B, double *s, int *g, int gLen){
-	int i,j,k;
-	double sum, innerSum, sub;
-	for(i=0; i<gLen; i++){
-		for (j = 0; j <gLen ; ++j) {
-			sub=B->getB(B,g[i],g[j]);
-			innerSum=0;
-			if(g[i]==g[j]){
-				for (k = 0; k < gLen ; ++k) {
-					innerSum+=B->getB(B,g[i],g[k]);
-				}
-			}
-			sub-=innerSum;
-			sum+=(sub*s[i]*s[j]);
-		}
-	}
-	return sum;
-}*/
 
 /* g is indivisible, return g in my_divistion->g1
  * and an empty group in my_divistion->g2 */

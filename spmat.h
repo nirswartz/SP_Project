@@ -30,9 +30,9 @@ void add_row_sparse(spmat *A, int *indices, int indicesLen, int rowNum);
 void free_sparse(spmat *A);
 
 /* Multiplies matrix A[g] by vector v, into result (result is pre-allocated)
- * g is a group with glen indices which define A[g]
- * len(v) = len(result) = dim(A[g]) = gLen*/
-void mult_sparse(const spmat *A, const double *v, double *result, int *g, int gLen);
+ * A[g] is created according to g before calling this function
+ * len(v) = len(result) = dim(A[g])*/
+void mult_sparse(const spmat *A, const double *v, double *result);
 
 /* getter A[i][j]*/
 double getter_sparse(const spmat *A, int i, int j);

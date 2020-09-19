@@ -1,14 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <time.h> /*todo*/
 #include "errors.h"
 #include "linkedList.h"
 #include "divide.h"
 #include "modMat.h"
-/*deleteeeeeeeeeeeeeeeeeeeeee*/
-#include "cluster.h"
-#include "help.h"
-/*deleteeeeeeeeeeeeeeeeeeeeee*/
 
 /* function deceleration */
 int main(int argc, char* argv[]);
@@ -16,16 +12,15 @@ void initialization_of_groups(linkedList *P, int n);
 void write_groups_to_file(linkedList *O, char *locationOutput);
 /* end of function deceleration */
 
-/*change to mainnnnnnnnnnnnnnnnnnnnnnnnnn*/
 /* The main algorithm which calculating the clusters according to Algorithm 3*/
-int cluster(int argc, char* argv[]){
+int main(int argc, char* argv[]){
     char *locationInput, *locationOutput;
     int *g,*g1,*g2, gLen, size_g1, size_g2;
     linkedList *O, *P;
     modMat *B;
     division *my_division;
 
-    /*timing - deleteeeeeeeeeeeeeeeeeeeeeee*/
+    /*todo timing - deleteeeeeeeeeeeeeeeeeeeeeee*/
     clock_t t;
     double time_taken, vertexes;
     t = clock();
@@ -34,7 +29,7 @@ int cluster(int argc, char* argv[]){
     locationOutput = argv[2];
 
     /* Creating division*/
-     my_division = division_allocate();
+    my_division = division_allocate();
 
     /*Creating matrix B*/
     B = modMat_allocate(locationInput);
@@ -62,7 +57,6 @@ int cluster(int argc, char* argv[]){
         /* Stage 3.3 - check if g1 or g2 is of size 0*/
         if(size_g1 == 0 || size_g2 == 0){
             insert_last(O,g,gLen);
-            /*free(g2); TODO:free garbage cell*/
         }
         else {
             /* Stage 3.4 - add groups to P or O*/
@@ -84,28 +78,27 @@ int cluster(int argc, char* argv[]){
 
     /*TODO - delete*/
     vertexes=(double)B->n;
-    argc=argc;
-    /*delete*/
 
     /*free B*/
     free_modMat(B);
     free(B);
 
     /*free division*/
-    /* TODO: no need to use free_division(my_division), because the free happens on free_linkedList*/
+    /*no need to use free_division(my_division), because the free happens on make_division and free_linkedList*/
     free(my_division);
 
     /*free linkedList*/
-    /* TODO: no need to use free_linkedList(P), because P is empty here like described in Algorithm 3*/
+    /*no need to use free_linkedList(P), because P is empty here like described in Algorithm 3*/
     free_linkedList(O);
     free(P);
     free(O);
 
-    /*end timing - deleteeeeeeeeeeeeeee*/
+    /*todo end timing - deleteeeeeeeeeeeeeee*/
     t = clock() - t;
     time_taken = (((double)t)/CLOCKS_PER_SEC); /* in seconds*/
     printf("\nRun for %f vertexes took %f seconds to execute \n",vertexes, time_taken);
 
+    argc = argc + 0;
     return 0;
 }
 
@@ -150,12 +143,4 @@ void write_groups_to_file(linkedList *O, char *locationOutput){
         tmp = tmp->next;
     }
     fclose(fOutput);
-}
-
-/*deleteeeeeeeeeeeeeeeeeee*/
-int main(int argc, char* argv[]){
-    test10();
-    argc=argc+0;
-    argv[0]="nir";
-    return 0;
 }

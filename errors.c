@@ -10,6 +10,7 @@ void check_open_file(void *open, char *fileName, int rowNum, char *programName);
 void check_empty_list(int len, int rowNum, char *programName);
 void check_empty_graph(int size, int rowNum, char *programName);
 void check_no_edges(int edgeNum, int rowNum, char *programName);
+void check_infinite_loop(int totalIters, int upperBound, int rowNum, char *programName);
 /* end of functions deceleration */
 
 void check_allocation(void* pointer, int rowNum, char *programName){
@@ -68,5 +69,12 @@ void check_no_edges(int edgeNum, int rowNum, char *programName){
     if(edgeNum == 0){
         printf("The graph has no edges, so every division is legit with zero modularity in line: %d in program: %s\n",rowNum, programName);
         exit(80);
+    }
+}
+
+void check_infinite_loop(int totalIters, int upperBound, int rowNum, char *programName){
+    if(totalIters > upperBound){
+        printf("The program got into infinite loop line: %d in program: %s\n",rowNum, programName);
+        exit(90);
     }
 }

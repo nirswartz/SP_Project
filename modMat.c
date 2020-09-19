@@ -6,6 +6,8 @@
 #include "spmat.h"
 #include "errors.h"
 
+#define UPPER_BOUND(x) (20 * (x) + 50000)
+
 /*function declaration*/
 modMat* modMat_allocate(char *location);
 double getter_B(const modMat *B, int i, int j);
@@ -13,14 +15,10 @@ void mult_HatB(const modMat *B, const double *v, double *result, int *g, int gLe
 void update_HatB_vectors(modMat *B, int *g, int gLen);
 void free_modMat(modMat *mat);
 void load_data_from_input_file(modMat *B, char *location);
-void calc_f_vector(const modMat *B, double *f, int *g, int gLen);
+void calc_f_vector_and_Ag(const modMat *B, int *g, int gLen);
 double calc_norm(modMat *B);
-void vector_addition(double *res, double *v, int vectorLen);
-void vector_subtraction(double *res, double *v, int vectorLen);
-void vector_mult(const double *v0, const double *v1, double *res, int vectorLen);
-double dot_product_by_g(const int* row1,const double* row2,int *g, int gLen);
-void vector_scalar_mult_by_g(const int *v, double scalar, double *res, int *g,int gLen);
-void vector_scalar_mult(const double *v, double scalar, double *res,int gLen);
+double dot_product_by_g(const int* row1, const double* row2,int *g, int gLen);
+int count_nnz_by_g(spmat *A, int *g, int gLen);
 /*end of functions declaration*/
 
 
@@ -37,9 +35,12 @@ modMat* modMat_allocate(char *location){
     /*initialize norm of B */
     mat->norm = calc_norm(mat);
 
-    /*initialize f vector and calc vector*/
+    /*initialize f vector and A[g] sparse matrix*/
     mat->last_f = NULL;
-    mat->calc_double_vector = NULL;
+    mat->last_Ag = NULL;
+
+    /* Defines the upper bound of iterations in order to avoid infinite loops*/
+    mat->upper_bound = UPPER_BOUND(mat->n);
 
     return mat;
 }
@@ -53,90 +54,47 @@ double getter_B(const modMat *B, int i, int j){
     return (A_ij - x);
 }
 
-/*deleteeeee ??????????*/
-/* getter for B^(i,j) according to last_f */
-double getter_HatB(const modMat *B, int i, int j, int *g, int gLen){
-    double B_ij, x=0;
-    int y;
-    B_ij = getter_B(B,i,j);
-    /*calculate B_ij-delta_ij*f_i */
-    if(i==j){
-        for (y = 0; y < gLen; ++y) {
-            if(*g == i){
-                x = B->last_f[y];
-            }
-            g++;
-        }
-    }
-    return (B_ij - x);
-}
-
 /* B_hat[g]*v = A[g]*v - (k^T*v*k)/M - f*I*v + ||B_hat[g]||*I*v */
 void mult_HatB(const modMat *B, const double *v, double *result, int *g, int gLen){
-    double *tmp, scalar;
-
-    /*Using calc double vector of B instead of allocate new vector*/
-    tmp = B->calc_double_vector;
+    double scalar , *f = B->last_f;
+    int i, *k = B->k;
 
     /* calculating A*v */
-    mult_sparse(B->A,v,result,g,gLen);
+    mult_sparse(B->last_Ag,v,result);
 
     /* calculating ((k^T*v)/M)* k */
     scalar = (dot_product_by_g(B->k, v, g,gLen)) / B->M;
-    vector_scalar_mult_by_g(B->k, scalar, tmp,g, gLen);
-    /*subtract tmp from result*/
-    vector_subtraction(result, tmp, gLen);
 
-    /* calculating f*I*v */
-    vector_mult(B->last_f, v, tmp, gLen);
-    /*subtract tmp from result*/
-    vector_subtraction(result, tmp, gLen);
+    /* calculating simultaneity each coordination in the result vector*/
+    for (i = 0; i < gLen; ++i) {
+        *result = *result - (scalar * (double)(*(k+*g))) - (*f * *v) + (B->norm * *v);
+        result++;
+        f++;
+        v++;
+        g++;
+    }
 
-    /* calculating ||B_hat||*v */
-    vector_scalar_mult(v,B->norm, tmp, gLen);
-    /*add tmp to result*/
-    vector_addition(result, tmp, gLen);
 }
 
-/* B_hat[g]*v = A[g]*v - (k^T*v*k)/M - f*I*v + ||B_hat[g]||*I*v */
-/*deleteeeeeeeeeeee ?????????*/
-/*void multB_hat_noShift(const struct _modMat *B, const double *v, double *result, int *g, int gLen){
-    double *tmp, scalar, *f;
-    tmp = calloc(gLen,sizeof(double));
-    checkAllocation(tmp, __LINE__,__FILE__);
-    f=B->last_f;
-
-    calculating A*v
-    mult_sparse(B->A,v,result,g,gLen);
-
-     calculating ((k^T*v)/M)* k
-    scalar = (dotProductByG(B->k, v, g,gLen)) / B->M;
-    vectorScalarMultByG(B->k, scalar, tmp,g, gLen);
-    add tmp to result
-    vectorSubtraction(result, tmp, gLen);
-
-     calculating f*I*v
-    vectorMult(f, v, tmp, gLen);
-    add tmp to result
-    vectorSubtraction(result, tmp, gLen);
-
-    free(tmp);
-}*/
-
-/*Calc f vector according to g*/
+/*Calc f vector and A[g] according to g*/
 void update_HatB_vectors(modMat *B, int *g, int gLen){
     /* create f according to g */
     if(B->last_f != NULL){
         free(B->last_f);
     }
-    if(B->calc_double_vector != NULL){
-        free(B->calc_double_vector);
+    if(B->last_Ag != NULL && B->last_Ag->n != B->A->n){
+        free_sparse(B->last_Ag);
+        free(B->last_Ag);
     }
     B->last_f = calloc(gLen,sizeof(double));
     check_allocation(B->last_f, __LINE__, __FILE__);
-    calc_f_vector(B, B->last_f, g, gLen);
-    B->calc_double_vector = calloc(gLen,sizeof(double));
-    check_allocation(B->calc_double_vector, __LINE__, __FILE__);
+    if(gLen == B->n){
+        B->last_Ag = B->A;
+    }
+    else{
+        B->last_Ag = spmat_allocate(gLen, count_nnz_by_g(B->A, g, gLen));
+    }
+    calc_f_vector_and_Ag(B, g, gLen);
 }
 
 /*Free all allocations*/
@@ -147,20 +105,12 @@ void free_modMat(modMat *mat){
     if(mat->last_f != NULL){
         free(mat->last_f);
     }
-    if(mat->calc_double_vector != NULL){
-        free(mat->calc_double_vector);
+    if(mat->last_Ag !=NULL){
+        free_sparse(mat->last_Ag);
+        free(mat->last_Ag);
     }
-}
 
-/*update the vector's values in specific indexes to the same value*/
-/*
-void updated_vector_by_indices_with_value(double *vector,int *indices, int indicesLen, double value){
-    int i=0;
-    for(i = 0; i < indicesLen ; ++i){
-        vector[*indices] = value;
-        indices++;
-    }
-}*/
+}
 
 /* load all data from input file: n(number of nodes), k vector, M(nnz) and create sparse matrix of A*/
 void load_data_from_input_file(modMat *B, char *location){
@@ -210,55 +160,41 @@ void load_data_from_input_file(modMat *B, char *location){
     free(indices);
 }
 
-/* create vector (f_1,f_2,...,f_gLen) according to g, result will be placed in f */
-void calc_f_vector(const modMat *B, double *f, int *g, int gLen){
-    int i,j, *gOut = g, *gIn = g;
-    double sum;
+/* create vector (f_1,f_2,...,f_gLen) and A[g] according to g, result will be placed in f */
+void calc_f_vector_and_Ag(const modMat *B, int *g, int gLen){
+    int i,j, *gOut = g, *gIn = g , *indices, *startIndices, countIndices;
+    double A_ij, sum_k_j , *f = B->last_f , sum_row_A_g_ij;
+
+    indices = calloc(gLen,sizeof(int));
+    check_allocation(indices,__LINE__,__FILE__);
+    startIndices = indices;
 
     for (i = 0; i < gLen ; ++i) {
-        sum = 0;
-        for (j = 0; j < gLen ; ++j) {
-            sum += getter_B(B,*gOut,*gIn); /*@@@@change@@@@*/
+        sum_row_A_g_ij = 0.0;
+        sum_k_j = 0.0;
+        countIndices = 0;
+        for (j = 0; j < gLen; ++j) {
+            A_ij = getter_sparse(B->A, *gOut, *gIn);
+            if(A_ij == 1.0){
+                *indices = j;
+                indices++;
+                countIndices++;
+            }
+            sum_row_A_g_ij += A_ij;
+            sum_k_j += (double) B->k[*gIn];
             gIn++;
         }
-        *f = sum;
+        *f = sum_row_A_g_ij - ((B->k[*gOut] / (double)B->M) * sum_k_j);
         f++;
         gOut++;
         gIn = g;
+        indices = startIndices;
+        if(gLen != B->n){
+            add_row_sparse(B->last_Ag,indices,countIndices,i);
+        }
     }
+    free(indices);
 }
-
-/*delteeeeeeeee?*/
-/* calculate 1-norm of B^[g]*/
-/*double calc_norm(const modMat *B,  double *f, int *g, int gLen){
-    int i, j, *gOut = g, *gIn;
-    double *arr, *p, max;
-
-    arr = calloc(gLen,sizeof(double));
-    checkAllocation(arr, __LINE__, __FILE__);
-    calculating sum of each column - each cell in arr is the sum of a different column
-    for (i = 0; i < gLen ; ++i) {
-        p = arr;
-        gIn = g;
-        for (j = 0; j < gLen ; ++j) {
-            *p += fabs(B->getHatB(B,*gOut,*gIn,g,gLen,f));
-            gIn++;
-            p++;
-        }
-        gOut++;
-    }
-     finding maximal sum of all columns
-    p=arr;
-    max = *p;
-    for (i = 0; i < gLen ; ++i) {
-        if(*p > max){
-            max = *p;
-        }
-        p++;
-    }
-    free(arr);
-    return max;
-}*/
 
 /* calculating 1-norm of B_hat using getter of B*/
 double calc_norm(modMat *B){
@@ -277,40 +213,6 @@ double calc_norm(modMat *B){
     return max;
 }
 
-/* for v = (v_1,...,v_n) and res = (r_1,...,r_n) vectorAddition(res,v) = (v_1+r_1,...,v_n+r_n)*/
-/* result of addition will be placed in res vector */
-void vector_addition(double *res, double *v, int vectorLen){
-    int i;
-    for (i = 0; i < vectorLen; ++i) {
-        *res = *res + *v;
-        res++;
-        v++;
-    }
-}
-
-/* for v = (v_1,...,v_n) and res = (r_1,...,r_n) vectorSubtraction(res,v) = (r_1-v_1,...,r_n-v_n)*/
-/* result of Subtraction will be placed in res vector */
-void vector_subtraction(double *res, double *v, int vectorLen){
-    int i;
-    for (i = 0; i < vectorLen; ++i) {
-        *res = *res - *v;
-        res++;
-        v++;
-    }
-}
-
-/* for v0 = (v0_1,...,v0_n) and v1 = (v1_1,...,v1_n) res = (v0_1*v1_1,...,v0_n*v1_n)*/
-/* result of addition will be placed in res vector */
-void vector_mult(const double *v0, const double *v1, double *res, int vectorLen){
-    int i;
-    for (i = 0; i < vectorLen; ++i) {
-        *res = *v0 * *v1;
-        res++;
-        v0++;
-        v1++;
-    }
-}
-
 /*calculating dot product of two rows by g on first vector only!*/
 double dot_product_by_g(const int* row1,const double* row2,int *g, int gLen){
     int i;
@@ -323,66 +225,18 @@ double dot_product_by_g(const int* row1,const double* row2,int *g, int gLen){
     return sum;
 }
 
-/* for v = (v_1,...,v_n) and scalar res = (v_1*scalar,...,v_n*scalar) according g on first vector only!*/
-/* result will be placed in res vector */
-void vector_scalar_mult_by_g(const int *v, double scalar, double *res, int *g,int gLen){
-    int i;
-    for (i = 0; i < gLen; ++i) {
-        *res = (scalar * (*(v+*g)));
-        res++;
-        g++;
-    }
-}
-
-/* for v = (v_1,...,v_n) and scalar res = (v_1*scalar,...,v_n*scalar)*/
-/* result will be placed in res vector */
-void vector_scalar_mult(const double *v, double scalar, double *res,int gLen){
-    int i;
-    for (i = 0; i < gLen; ++i) {
-        *res = (scalar * (*v));
-        res++;
-        v++;
-    }
-}
-
-/*delteeeeeee*/
-void printA(modMat *B){
-    int i,j;
-    printf("A matrix is:\n");
-    for(i=0;i<B->n;i++){
-        printf("{ ");
-        for(j = 0; j < B->n-1; ++j){
-            printf("%.3f ,",getter_sparse(B->A,i,j));
+int count_nnz_by_g(spmat *A, int *g, int gLen){
+    int i,j, *gOut = g, *gIn = g , nnz = 0;
+    for (i = 0; i < gLen ; ++i) {
+        for (j = 0; j < gLen; ++j) {
+            if(getter_sparse(A, *gOut, *gIn) == 1.0){
+                nnz++;
+            }
+            gIn++;
         }
-        printf("%.3f }\n",getter_sparse(B->A,i,j));
+        gOut++;
+        gIn = g;
     }
+    return nnz;
 }
-
-/*delteeeeeee*/
-void printB(modMat *B){
-    int i,j;
-    printf("B matrix is:\n");
-    for(i=0;i<B->n;i++){
-        printf("{ ");
-        for(j = 0; j < B->n-1; ++j){
-            printf("%.3f ,",getter_B(B,i,j));
-        }
-        printf("%.3f }\n",getter_B(B,i,j));
-    }
-}
-
-/*delteeeeeee*/
-/*
-void printHatB(modMat *HatB){
-    int i,j;
-    printf("Hat B matrix is:\n");
-    for(i=0;i<HatB->n;i++){
-        printf("{ ");
-        for(j = 0; j < HatB->n-1; ++j){
-            printf("%.3f ,",HatB->getHatB(HatB,i,j));
-        }
-        printf("%.3f }\n",HatB->getHatB(HatB,i,j));
-    }
-}*/
-
 
