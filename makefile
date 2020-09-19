@@ -29,3 +29,4 @@ modMat.o: modMat.c modMat.h errors.h spmat.h
 
 spmat.o: spmat.c spmat.h errors.h
 	gcc $(FLAGS) -c spmat.c
+	
