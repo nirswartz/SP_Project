@@ -1,6 +1,8 @@
 #ifndef SP_PROJECT_ERRORS_H
 #define SP_PROJECT_ERRORS_H
 
+/* This module allows efficient error handling, each function returns the problematic line and the name of the program */
+
 /*checks if the last allocation was successful - Exit code 10*/
 void check_allocation(void* pointer, int rowNum, char *programName);
 

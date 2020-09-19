@@ -2,7 +2,7 @@
 #define SP_PROJECT_EIGEN_H
 #include "modMat.h"
 
-/*calculating dominant eigen vector of B^[g]*, result will be placed in vector*/
+/*calculating dominant eigen vector of B^[g], result will be placed in vector*/
 void power_iteration(modMat *B, double *vector, int *g, int gLen);
 
 /*calculating dot product of two rows*/

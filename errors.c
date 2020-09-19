@@ -51,7 +51,7 @@ void check_open_file(void *open, char *fileName, int rowNum, char *programName){
 /* checks if the list is empty before deleting a node  - Exit code 60*/
 void check_empty_list(int len, int rowNum, char *programName){
     if(len == 0){
-        printf("Couldn't delete a node / print list because the list is empty in line: %d in program: %s\n",rowNum, programName);
+        printf("Couldn't delete a node because the list is empty in line: %d in program: %s\n",rowNum, programName);
         exit(60);
     }
 }
